@@ -1,8 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-【代码 B】读取 page_tree.json，按树状结构创建嵌套文件夹，
-使用 Crawl4AI（与 confluence_crawl4ai.py 相同策略）导出 Markdown。
+【代码 B】读取 page_tree.json（如 output/AI项目_page_tree.json），按树递归创建子文件夹，
+用 Crawl4AI 抓取内网 Wiki 并导出 Markdown。
+
+抓取与 HTML→Markdown 流程与 code/confluence_crawl4ai.py 对齐：登录钩子使用 networkidle、
+整页 HTML 经 fix_relative_paths / handle_complex_tables / custom_markdownify（不裁切
+#main-content，尽量保留正文与评论等全部 DOM）。每页写入「节点标题.md」，resume 仍识别
+index.md。环境变量：CONFLUENCE_BASE_URL、CONFLUENCE_USERNAME、CONFLUENCE_PASSWORD。
 """
 
 from __future__ import annotations
@@ -30,13 +35,10 @@ from markdownify import markdownify as md
 _WORKSPACE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DEFAULT_OUTPUT_BASE = os.path.join(_WORKSPACE_DIR, "output")
 
-# 依次尝试：先严格等 #main-content，再放宽选择器，最后不设 wait_for（依赖 dom 加载）
+# 与 confluence_crawl4ai.py 一致首选 wait_for=#main-content；失败时再尝试不设 wait_for
 _FETCH_WAIT_PROFILES: Tuple[Dict[str, Union[str, int, None]], ...] = (
     {"wait_for": "css:#main-content", "page_timeout": 120_000, "wait_for_timeout": 120_000},
-    {"wait_for": "css:#main-content", "page_timeout": 180_000, "wait_for_timeout": 180_000},
-    {"wait_for": "css:.wiki-content", "page_timeout": 120_000, "wait_for_timeout": 120_000},
-    {"wait_for": "css:#wiki-content", "page_timeout": 120_000, "wait_for_timeout": 120_000},
-    {"wait_for": None, "page_timeout": 150_000, "wait_for_timeout": None},
+    {"wait_for": None, "page_timeout": 180_000, "wait_for_timeout": None},
 )
 
 
@@ -106,6 +108,51 @@ def sanitize_segment(node: Dict[str, Any]) -> str:
     return sanitize_filename(node.get("title") or f"page_{node.get('id', '')}")
 
 
+def strip_browser_title_suffix(title: str) -> str:
+    """
+    去掉 Crawl4AI / 浏览器 <title> 常见后缀：「页面名 - 空间 - Htek wiki」。
+    若无法匹配则原样返回（去首尾空白）。
+    """
+    t = (title or "").strip()
+    if not t:
+        return ""
+    m = re.match(r"^(.+?)\s+-\s+.+\s+-\s*Htek\s+wiki\s*$", t, flags=re.IGNORECASE)
+    if m:
+        return m.group(1).strip()
+    return t
+
+
+def markdown_basename_for_page(
+    node: Dict[str, Any],
+    page_id: str,
+    fetched_title: Optional[str],
+) -> str:
+    """
+    导出用 .md 主文件名（不含扩展名）。
+    优先使用与 page_tree.json 一致的节点 title，便于与 rel_parts 目录语义对齐且 resume 稳定；
+    节点无 title 时再用抓取标题（去掉「- 空间 - Htek wiki」类后缀），最后回退 slug / page_id。
+    """
+    nt = (node.get("title") or "").strip()
+    if nt:
+        return sanitize_filename(nt) or "untitled"
+    cleaned = strip_browser_title_suffix(fetched_title or "")
+    if cleaned:
+        return sanitize_filename(cleaned) or "untitled"
+    base = sanitize_segment(node) or f"page_{page_id}"
+    return sanitize_filename(base) or "untitled"
+
+
+def resolve_markdown_output_path(
+    current_dir: str,
+    node: Dict[str, Any],
+    page_id: str,
+    fetched_title: Optional[str],
+) -> str:
+    """当前页应写入的 .md 绝对路径。"""
+    stem = markdown_basename_for_page(node, page_id, fetched_title)
+    return os.path.join(current_dir, f"{stem}.md")
+
+
 def fix_relative_paths(html: str, base_url: str) -> str:
     base = base_url.rstrip("/")
     soup = BeautifulSoup(html, "html.parser")
@@ -132,28 +179,29 @@ def custom_markdownify(html: str) -> str:
     soup = BeautifulSoup(html, "html.parser")
     preserved_tables: List[str] = []
 
+    # 纯字母数字占位符，避免 markdownify 对下划线等转义导致 replace 失败（旧版 HTML 注释占位会变为 PRESERVED\_TABLE\_0）
     for i, table in enumerate(soup.find_all("table", {"data-preserve-html": "true"})):
-        placeholder = f"<!-- PRESERVED_TABLE_{i} -->"
+        placeholder = f"@@PRESERVEDTABLE{i}@@"
         preserved_tables.append(str(table))
         table.replace_with(placeholder)
 
     markdown_content = md(str(soup), heading_style="ATX")
 
     for i, table_html in enumerate(preserved_tables):
-        placeholder = f"<!-- PRESERVED_TABLE_{i} -->"
+        placeholder = f"@@PRESERVEDTABLE{i}@@"
         markdown_content = markdown_content.replace(placeholder, "\n\n" + table_html + "\n\n")
 
     return markdown_content
 
 
-def narrow_confluence_main_html(html: str) -> str:
-    """尽量只保留正文区域再转 Markdown，降低侧栏/页眉混入概率。"""
-    soup = BeautifulSoup(html, "html.parser")
-    for sel in ("#main-content", "#wiki-content", ".wiki-content", "#content"):
-        el = soup.select_one(sel)
-        if el:
-            return str(el)
-    return html
+def crawler_html_to_markdown(html: str, base_url: str) -> str:
+    """
+    与 confluence_crawl4ai.py 中 fetch 成功后的处理一致：不裁切 #main-content，
+    保留整页 HTML（含评论区等），再 fix_relative_paths → handle_complex_tables → custom_markdownify。
+    """
+    html_content = fix_relative_paths(html, base_url)
+    html_content = handle_complex_tables(html_content)
+    return custom_markdownify(html_content)
 
 
 def _login_env() -> Tuple[str, str, str]:
@@ -165,35 +213,28 @@ def _login_env() -> Tuple[str, str, str]:
 
 async def on_page_context_created(page, context, **kwargs):
     """
-    打开登录页：若存在标准 Confluence 表单则填写；若无（已登录 / 企业 SSO 自定义页），
-    则跳过填表，避免对 #os_username 长时间超时导致后续整批失败。
+    与 confluence_crawl4ai.py 一致：进入 login.action → networkidle → 填写 os 表单 → 点击登录
+    → networkidle → sleep(3)。失败仅记录日志并返回 page，由后续 arun 继续尝试目标页。
     """
     logger = logging.getLogger("markdown_tree_export")
     base_url, username, password = _login_env()
-    login_url = f"{base_url}/login.action"
-    try:
-        logger.info("正在检测登录页: %s", login_url)
-        await page.goto(login_url, wait_until="domcontentloaded", timeout=90_000)
-        try:
-            await page.wait_for_selector("#os_username", timeout=20_000)
-        except Exception:
-            logger.info(
-                "未检测到 #os_username（可能已登录或为企业 SSO 页），跳过表单登录，继续后续抓取"
-            )
-            return page
+    if not base_url or not username or not password:
+        logger.warning("登录钩子: 缺少 CONFLUENCE_BASE_URL / USERNAME / PASSWORD，跳过自动登录")
+        return page
 
-        logger.info("检测到标准登录表单，正在填写…")
-        await page.fill("#os_username", username, timeout=15_000)
-        await page.fill("#os_password", password, timeout=15_000)
+    login_url = f"{base_url.rstrip('/')}/login.action"
+    try:
+        logger.info("正在执行自动化登录流程: %s", login_url)
+        await page.goto(login_url, wait_until="networkidle", timeout=90_000)
+        await page.fill("#os_username", username)
+        await page.fill("#os_password", password)
         await page.click("#loginButton")
-        try:
-            await page.wait_for_load_state("domcontentloaded", timeout=90_000)
-        except Exception:
-            logger.warning("登录提交后 domcontentloaded 等待超时，继续执行")
-        logger.info("登录流程结束，等待 3 秒稳定会话…")
+        await page.wait_for_load_state("networkidle")
+        logger.info("登录完成，等待 3 秒确保会话稳定…")
         await asyncio.sleep(3)
+        logger.info("自动化登录执行完毕")
     except Exception as exc:  # noqa: BLE001
-        logger.error("登录过程异常: %s", exc)
+        logger.error("登录失败: %s", exc)
         logger.error(traceback.format_exc())
     return page
 
@@ -241,10 +282,7 @@ async def fetch_confluence_page(
             result: CrawlResult = await crawler.arun(url=url, config=run_config)
             if result.success and result.html:
                 title = result.metadata.get("title", f"page_{page_id}")
-                html_content = narrow_confluence_main_html(result.html)
-                html_content = fix_relative_paths(html_content, base_url)
-                html_content = handle_complex_tables(html_content)
-                markdown_content = custom_markdownify(html_content)
+                markdown_content = crawler_html_to_markdown(result.html, base_url)
                 if markdown_content and markdown_content.strip():
                     return title, markdown_content, ""
                 last_err = "HTML 转 Markdown 后为空"
@@ -333,6 +371,26 @@ def load_tree(path: str) -> Dict[str, Any]:
         return json.load(f)
 
 
+def _should_skip_resume_export(
+    current_dir: str,
+    node: Dict[str, Any],
+    page_id: str,
+    resume: bool,
+) -> bool:
+    """
+    resume 时：若目标标题 .md 已存在且非空则跳过；兼容旧版同目录 index.md。
+    探测路径按「尚无抓取标题」时的预期文件名（与树节点 title/slug 一致），避免误跳过。
+    """
+    if not resume:
+        return False
+    primary = resolve_markdown_output_path(current_dir, node, page_id, None)
+    legacy = os.path.join(current_dir, "index.md")
+    for p in (primary, legacy):
+        if os.path.isfile(p) and os.path.getsize(p) > 0:
+            return True
+    return False
+
+
 async def export_subtree(
     crawler: AsyncWebCrawler,
     node: Dict[str, Any],
@@ -348,8 +406,9 @@ async def export_subtree(
     max_strategies: int,
 ) -> None:
     """
-    在 base_dir 下按 rel_parts 拼出当前页目录，写入 index.md，再递归子节点。
-    子目录名：json 的 slug（经 sanitize），同层重名则附加 _{page_id}。
+    在 base_dir 下按 rel_parts 拼出当前页目录，写入「标题.md」，再递归子节点。
+    子目录结构仍由 page_tree.json（如 AI项目_page_tree.json）的 children 与 slug/title 决定，
+    同层文件夹重名则 unique_folder_name 附加 _{page_id}。
     """
     if stats["sequence"] > 0:
         delay = random.uniform(throttle_min, throttle_max)
@@ -360,15 +419,20 @@ async def export_subtree(
     page_id = str(node.get("id", ""))
     current_dir = os.path.join(base_dir, *rel_parts)
     os.makedirs(current_dir, exist_ok=True)
-    md_path = os.path.join(current_dir, "index.md")
 
-    if resume and os.path.isfile(md_path) and os.path.getsize(md_path) > 0:
-        logger.info("跳过（已存在）: %s", md_path)
+    if _should_skip_resume_export(current_dir, node, page_id, resume):
+        primary = resolve_markdown_output_path(current_dir, node, page_id, None)
+        legacy = os.path.join(current_dir, "index.md")
+        hit = primary if os.path.isfile(primary) and os.path.getsize(primary) > 0 else legacy
+        logger.info("跳过（已存在）: %s", hit)
         stats["skipped"] += 1
     else:
         title, markdown_content, err_msg = await fetch_confluence_page(
             crawler, page_id, base_url, logger, max_strategies
         )
+
+        md_path = resolve_markdown_output_path(current_dir, node, page_id, title)
+
         if title and markdown_content:
             with open(md_path, "w", encoding="utf-8") as f:
                 f.write(markdown_content)
@@ -436,7 +500,7 @@ async def async_main() -> int:
     parser.add_argument(
         "--resume",
         action="store_true",
-        help="若某页 index.md 已存在且非空则跳过抓取，仍递归子目录",
+        help="若某页「标题.md」（或旧版 index.md）已存在且非空则跳过抓取，仍递归子目录",
     )
     parser.add_argument(
         "--throttle-min",
@@ -456,7 +520,7 @@ async def async_main() -> int:
         default=len(_FETCH_WAIT_PROFILES),
         metavar="N",
         help=(
-            "单页最多尝试的抓取策略数（1–%s），越大越不易失败但耗时更长"
+            "单页最多尝试的 wait 策略数（1–%s）：先 #main-content，再不设 wait_for"
             % len(_FETCH_WAIT_PROFILES)
         ),
     )
