@@ -1,6 +1,6 @@
 # 企业 WIKI 爬取与 Markdown 导出工具
 
-本项目用于自动化爬取 Confluence (v7.7.4) 企业内部 Wiki，并将其结构化导出为干净的本地 Markdown 文件。
+本项目用于自动化爬取 Confluence (v7.7.4) 企业内部 Wiki，并将其结构化导出为干净的本地 Markdown 文件。成果放在output文件夹
 
 ## ⚙️ 依赖与环境
 
