@@ -21,9 +21,9 @@ BASE_URL = "http://oa.htek.com:8090"
 OUTPUT_DIR = r"e:\Htek\output"
 LOG_DIR = r"e:\Htek\log"
 
-# 登录凭证
-USERNAME = "leo.lu"
-PASSWORD = "Lzh654321"
+# 登录凭证，需要手动输入
+USERNAME = ""
+PASSWORD = ""
 
 # 手动定义的默认 Page ID 列表。
 # 当不使用命令行传参直接运行脚本时，将默认爬取这里的页面。
