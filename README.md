@@ -1,6 +1,6 @@
-# Confluence 爬取与 Markdown 导出
+# 企业WIKI 爬取与 Markdown 导出
 
-本文说明仓库内三个脚本的分工、依赖与用法。三者均基于 **Crawl4AI**（Playwright 无头浏览器）访问 Confluence，适用于需真实会话、动态页面或企业 SSO 的场景。
+本文说明仓库内两个脚本的分工、依赖与用法。三者均基于 **Crawl4AI**（Playwright 无头浏览器）访问 Confluence。
 
 ---
 
@@ -9,7 +9,6 @@
 在 `code` 目录下安装 Python 依赖（见同目录 `requirements.txt`）：
 
 ```powershell
-cd E:\Htek\code
 pip install -r requirements.txt
 python -m playwright install chromium
 ```
