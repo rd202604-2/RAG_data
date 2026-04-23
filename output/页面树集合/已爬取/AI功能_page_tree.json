@@ -1,0 +1,288 @@
+{
+  "id": "257003136",
+  "title": "AI功能",
+  "type": "page",
+  "slug": "AI功能",
+  "children": [
+    {
+      "id": "257003697",
+      "title": "AI相关项目规划",
+      "type": "page",
+      "slug": "AI相关项目规划",
+      "children": []
+    },
+    {
+      "id": "257003690",
+      "title": "OpenClaw",
+      "type": "page",
+      "slug": "OpenClaw",
+      "children": [
+        {
+          "id": "257004711",
+          "title": "安卓话机部署Openclaw",
+          "type": "page",
+          "slug": "安卓话机部署Openclaw",
+          "children": []
+        }
+      ]
+    },
+    {
+      "id": "257004148",
+      "title": "Vibe Coding",
+      "type": "page",
+      "slug": "Vibe Coding",
+      "children": [
+        {
+          "id": "257004139",
+          "title": "AI工具选型",
+          "type": "page",
+          "slug": "AI工具选型",
+          "children": []
+        },
+        {
+          "id": "257004172",
+          "title": "AI辅助编程工具对比",
+          "type": "page",
+          "slug": "AI辅助编程工具对比",
+          "children": []
+        },
+        {
+          "id": "257004136",
+          "title": "Cursor软件使用教程",
+          "type": "page",
+          "slug": "Cursor软件使用教程",
+          "children": [
+            {
+              "id": "257004825",
+              "title": "Git 栏同时看到多个子目录仓库",
+              "type": "page",
+              "slug": "Git 栏同时看到多个子目录仓库",
+              "children": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "257003250",
+      "title": "TTS(文本转语音) & ASR（语音识别）",
+      "type": "page",
+      "slug": "TTS(文本转语音) & ASR（语音识别）",
+      "children": [
+        {
+          "id": "257004322",
+          "title": "TTS(VibeVoice-Realtime-0.5B)",
+          "type": "page",
+          "slug": "TTS(VibeVoice-Realtime-0.5B)",
+          "children": [
+            {
+              "id": "257003791",
+              "title": "1) VibeVoice-Realtime-0.5B 模型下载教程（Windows / PowerShell）",
+              "type": "page",
+              "slug": "1) VibeVoice-Realtime-0.5B 模型下载教程（Windows _ PowerShell）",
+              "children": []
+            },
+            {
+              "id": "257003795",
+              "title": "2) VibeVoice-Realtime-0.5B 模型初步使用文档（Windows / Python）",
+              "type": "page",
+              "slug": "2) VibeVoice-Realtime-0.5B 模型初步使用文档（Windows _ Python）",
+              "children": []
+            },
+            {
+              "id": "257003799",
+              "title": "3) 微软官方代码库VibeVoice 目录说明",
+              "type": "page",
+              "slug": "3) 微软官方代码库VibeVoice 目录说明",
+              "children": [
+                {
+                  "id": "257003802",
+                  "title": "3.1) VibeVoice Docs 阅读顺序建议",
+                  "type": "page",
+                  "slug": "3.1) VibeVoice Docs 阅读顺序建议",
+                  "children": []
+                },
+                {
+                  "id": "257003812",
+                  "title": "3.2) vibevoice-realtime-0.5b-zh-cn.md(实时流式 TTS 能力、安装与使用)",
+                  "type": "page",
+                  "slug": "3.2) vibevoice-realtime-0.5b-zh-cn.md(实时流式 TTS 能力、安装与使用)",
+                  "children": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "257004327",
+          "title": "TTS(MMS_TTS)",
+          "type": "page",
+          "slug": "TTS(MMS_TTS)",
+          "children": [
+            {
+              "id": "257004447",
+              "title": "MMS_TTS简介",
+              "type": "page",
+              "slug": "MMS_TTS简介",
+              "children": []
+            },
+            {
+              "id": "257004451",
+              "title": "RK3576运行结果",
+              "type": "page",
+              "slug": "RK3576运行结果",
+              "children": []
+            }
+          ]
+        },
+        {
+          "id": "257004445",
+          "title": "ASR(whisper)",
+          "type": "page",
+          "slug": "ASR(whisper)",
+          "children": [
+            {
+              "id": "257004728",
+              "title": "Whisper简介",
+              "type": "page",
+              "slug": "Whisper简介",
+              "children": []
+            },
+            {
+              "id": "257004467",
+              "title": "RK3576运行报告",
+              "type": "page",
+              "slug": "RK3576运行报告",
+              "children": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "257004332",
+      "title": "RKNN平台模型转换部署",
+      "type": "page",
+      "slug": "RKNN平台模型转换部署",
+      "children": [
+        {
+          "id": "257004731",
+          "title": "1）RKNN-Toolkit2使用手册",
+          "type": "page",
+          "slug": "1）RKNN-Toolkit2使用手册",
+          "children": []
+        },
+        {
+          "id": "257004744",
+          "title": "2）Rknn_model_zoo支持模型集",
+          "type": "page",
+          "slug": "2）Rknn_model_zoo支持模型集",
+          "children": [
+            {
+              "id": "257004749",
+              "title": "a）交叉编译环境搭建指南",
+              "type": "page",
+              "slug": "a）交叉编译环境搭建指南",
+              "children": []
+            },
+            {
+              "id": "257004752",
+              "title": "b）MMS-TTS模型 运行调试",
+              "type": "page",
+              "slug": "b）MMS-TTS模型 运行调试",
+              "children": []
+            },
+            {
+              "id": "257004756",
+              "title": "c） Whisper模型 运行调试",
+              "type": "page",
+              "slug": "c） Whisper模型 运行调试",
+              "children": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "257003705",
+      "title": "话机Agent开发",
+      "type": "page",
+      "slug": "话机Agent开发",
+      "children": []
+    },
+    {
+      "id": "257004522",
+      "title": "RAG(检索增强生成)",
+      "type": "page",
+      "slug": "RAG(检索增强生成)",
+      "children": [
+        {
+          "id": "257004598",
+          "title": "0)参考文章",
+          "type": "page",
+          "slug": "0)参考文章",
+          "children": []
+        },
+        {
+          "id": "257004600",
+          "title": "1)开发流程",
+          "type": "page",
+          "slug": "1)开发流程",
+          "children": []
+        },
+        {
+          "id": "257004603",
+          "title": "2) 开发日志",
+          "type": "page",
+          "slug": "2) 开发日志",
+          "children": []
+        }
+      ]
+    },
+    {
+      "id": "257004815",
+      "title": "AI项目管理",
+      "type": "page",
+      "slug": "AI项目管理",
+      "children": [
+        {
+          "id": "257004817",
+          "title": "参考项目 & 资料文献",
+          "type": "page",
+          "slug": "参考项目 & 资料文献",
+          "children": [
+            {
+              "id": "257004862",
+              "title": "1",
+              "type": "page",
+              "slug": "1",
+              "children": []
+            }
+          ]
+        },
+        {
+          "id": "257004821",
+          "title": "调研",
+          "type": "page",
+          "slug": "调研",
+          "children": [
+            {
+              "id": "257004872",
+              "title": "20260422 AI调研对话",
+              "type": "page",
+              "slug": "20260422 AI调研对话",
+              "children": []
+            },
+            {
+              "id": "257004885",
+              "title": "本地jira mcp测试",
+              "type": "page",
+              "slug": "本地jira mcp测试",
+              "children": []
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+log/
+*.log
+.env
+.llm.env
+__pycache__/
+*.pyc
+
+# 仓库根目录：忽略除 code 和 output 以外的所有顶层文件夹
+# （不忽略根目录下的单文件，如 README.md）
+/*/
+!code/
+!output/

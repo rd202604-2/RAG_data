@@ -1,0 +1,40 @@
+{
+  "version": 1,
+  "tree_order": [
+    "e:\\htek\\output\\页面树集合\\htek信息化空间_page_tree.json",
+    "e:\\htek\\output\\页面树集合\\下一代话机_page_tree.json",
+    "e:\\htek\\output\\页面树集合\\人力资源空间_page_tree.json",
+    "e:\\htek\\output\\页面树集合\\供应链园地_page_tree.json",
+    "e:\\htek\\output\\页面树集合\\公司任务库_page_tree.json",
+    "e:\\htek\\output\\页面树集合\\公司兼容空间_page_tree.json",
+    "e:\\htek\\output\\页面树集合\\南京汉隆科技有限公司_page_tree.json",
+    "e:\\htek\\output\\页面树集合\\史青敏的主页_page_tree.json",
+    "e:\\htek\\output\\页面树集合\\合理化建议区_page_tree.json",
+    "e:\\htek\\output\\页面树集合\\培训在线_page_tree.json",
+    "e:\\htek\\output\\页面树集合\\客户空间_page_tree.json",
+    "e:\\htek\\output\\页面树集合\\汉隆科技文档管理_page_tree.json",
+    "e:\\htek\\output\\页面树集合\\测试园地_page_tree.json",
+    "e:\\htek\\output\\页面树集合\\王平的主页_page_tree.json",
+    "e:\\htek\\output\\页面树集合\\章文倩's home_page_tree.json",
+    "e:\\htek\\output\\页面树集合\\自动化测试_page_tree.json",
+    "e:\\htek\\output\\页面树集合\\视频会议电话_page_tree.json",
+    "e:\\htek\\output\\页面树集合\\质量园地_page_tree.json",
+    "e:\\htek\\output\\页面树集合\\软件重构项目_page_tree.json",
+    "e:\\htek\\output\\页面树集合\\项目文档库_page_tree.json",
+    "e:\\htek\\output\\页面树集合\\马巴勤的主页_page_tree.json",
+    "e:\\htek\\output\\页面树集合\\高子涵的主页_page_tree.json"
+  ],
+  "trees_completed": [
+    "e:\\htek\\output\\页面树集合\\htek信息化空间_page_tree.json",
+    "e:\\htek\\output\\页面树集合\\下一代话机_page_tree.json"
+  ],
+  "last_page": {
+    "tree_json": "E:\\Htek\\output\\页面树集合\\人力资源空间_page_tree.json",
+    "page_id": "140544831",
+    "markdown_path": "E:\\Htek\\output\\人力资源空间_page_tree\\人力资源空间\\员工培训\\校招生培养\\培训课件＆录音\\第一周\\第一周.md",
+    "updated_at": "2026-04-23T17:59:34"
+  },
+  "status": "running",
+  "reason": "page_saved",
+  "saved_at": "2026-04-23T17:59:34"
+}

@@ -1,0 +1,1430 @@
+{
+  "id": "16181707",
+  "title": "视频会议电话",
+  "type": "page",
+  "slug": "视频会议电话",
+  "children": [
+    {
+      "id": "21825111",
+      "title": "其他",
+      "type": "page",
+      "slug": "其他",
+      "children": [
+        {
+          "id": "158566785",
+          "title": "RK SDK Download 公私钥信息",
+          "type": "page",
+          "slug": "RK SDK Download 公私钥信息",
+          "children": []
+        },
+        {
+          "id": "146113060",
+          "title": "RK联系信息",
+          "type": "page",
+          "slug": "RK联系信息",
+          "children": []
+        },
+        {
+          "id": "181048687",
+          "title": "待翻译俄语",
+          "type": "page",
+          "slug": "待翻译俄语",
+          "children": []
+        }
+      ]
+    },
+    {
+      "id": "205521854",
+      "title": "培训",
+      "type": "page",
+      "slug": "培训",
+      "children": [
+        {
+          "id": "205521856",
+          "title": "安卓视频入门介绍",
+          "type": "page",
+          "slug": "安卓视频入门介绍",
+          "children": []
+        }
+      ]
+    },
+    {
+      "id": "21823574",
+      "title": "文件列表",
+      "type": "page",
+      "slug": "文件列表",
+      "children": [
+        {
+          "id": "21823579",
+          "title": "参考文件",
+          "type": "page",
+          "slug": "参考文件",
+          "children": [
+            {
+              "id": "21825498",
+              "title": "A64相关文档",
+              "type": "page",
+              "slug": "A64相关文档",
+              "children": [
+                {
+                  "id": "21825528",
+                  "title": "A64 DataSheet UserManual",
+                  "type": "page",
+                  "slug": "A64 DataSheet UserManual",
+                  "children": []
+                },
+                {
+                  "id": "21825501",
+                  "title": "A64软件开发文档",
+                  "type": "page",
+                  "slug": "A64软件开发文档",
+                  "children": []
+                }
+              ]
+            },
+            {
+              "id": "21825532",
+              "title": "PINE64相关资料",
+              "type": "page",
+              "slug": "PINE64相关资料",
+              "children": [
+                {
+                  "id": "21825537",
+                  "title": "PINE64 文档",
+                  "type": "page",
+                  "slug": "PINE64 文档",
+                  "children": []
+                },
+                {
+                  "id": "21825534",
+                  "title": "PINE64相关网站",
+                  "type": "page",
+                  "slug": "PINE64相关网站",
+                  "children": []
+                }
+              ]
+            },
+            {
+              "id": "30901801",
+              "title": "Rockchip参考资料",
+              "type": "page",
+              "slug": "Rockchip参考资料",
+              "children": []
+            },
+            {
+              "id": "48758992",
+              "title": "android project information",
+              "type": "page",
+              "slug": "android project information",
+              "children": []
+            },
+            {
+              "id": "27296040",
+              "title": "broadcom相关文档",
+              "type": "page",
+              "slug": "broadcom相关文档",
+              "children": []
+            }
+          ]
+        },
+        {
+          "id": "181049281",
+          "title": "客户问题列表",
+          "type": "page",
+          "slug": "客户问题列表",
+          "children": []
+        },
+        {
+          "id": "174264610",
+          "title": "文档",
+          "type": "page",
+          "slug": "文档",
+          "children": [
+            {
+              "id": "174264616",
+              "title": "其它文档",
+              "type": "page",
+              "slug": "其它文档",
+              "children": []
+            },
+            {
+              "id": "174264612",
+              "title": "官方文档",
+              "type": "page",
+              "slug": "官方文档",
+              "children": []
+            }
+          ]
+        },
+        {
+          "id": "21823581",
+          "title": "设计文件",
+          "type": "page",
+          "slug": "设计文件",
+          "children": []
+        }
+      ]
+    },
+    {
+      "id": "122880311",
+      "title": "状态机",
+      "type": "page",
+      "slug": "状态机",
+      "children": []
+    },
+    {
+      "id": "16181931",
+      "title": "视频电话",
+      "type": "page",
+      "slug": "视频电话",
+      "children": [
+        {
+          "id": "16181933",
+          "title": "UC927",
+          "type": "page",
+          "slug": "UC927",
+          "children": [
+            {
+              "id": "16181938",
+              "title": "系统设计",
+              "type": "page",
+              "slug": "系统设计",
+              "children": [
+                {
+                  "id": "16181940",
+                  "title": "相关参考",
+                  "type": "page",
+                  "slug": "相关参考",
+                  "children": [
+                    {
+                      "id": "16181943",
+                      "title": "XML Browser",
+                      "type": "page",
+                      "slug": "XML Browser",
+                      "children": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "181048489",
+          "title": "user版本adb root方法",
+          "type": "page",
+          "slug": "user版本adb root方法",
+          "children": []
+        }
+      ]
+    },
+    {
+      "id": "21825040",
+      "title": "视频项目任务列表",
+      "type": "page",
+      "slug": "视频项目任务列表",
+      "children": []
+    },
+    {
+      "id": "196092601",
+      "title": "设备参数汇总",
+      "type": "page",
+      "slug": "设备参数汇总",
+      "children": [
+        {
+          "id": "238296421",
+          "title": "webrtc版本视频支持参数与配置",
+          "type": "page",
+          "slug": "webrtc版本视频支持参数与配置",
+          "children": []
+        },
+        {
+          "id": "224953564",
+          "title": "视频编解码数据表",
+          "type": "page",
+          "slug": "视频编解码数据表",
+          "children": []
+        }
+      ]
+    },
+    {
+      "id": "21825117",
+      "title": "项目执行",
+      "type": "page",
+      "slug": "项目执行",
+      "children": [
+        {
+          "id": "228393958",
+          "title": "2023年项目",
+          "type": "page",
+          "slug": "2023年项目",
+          "children": [
+            {
+              "id": "209813555",
+              "title": "蓝牙手柄BTH",
+              "type": "page",
+              "slug": "蓝牙手柄BTH",
+              "children": [
+                {
+                  "id": "209813596",
+                  "title": "行为定义与标准（20231202版）",
+                  "type": "page",
+                  "slug": "行为定义与标准（20231202版）",
+                  "children": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "228393956",
+          "title": "2024年项目",
+          "type": "page",
+          "slug": "2024年项目",
+          "children": [
+            {
+              "id": "228393962",
+              "title": "升级Android14",
+              "type": "page",
+              "slug": "升级Android14",
+              "children": [
+                {
+                  "id": "232426476",
+                  "title": "环境准备与编译方法",
+                  "type": "page",
+                  "slug": "环境准备与编译方法",
+                  "children": []
+                }
+              ]
+            },
+            {
+              "id": "228393960",
+              "title": "车载蓝牙",
+              "type": "page",
+              "slug": "车载蓝牙",
+              "children": []
+            },
+            {
+              "id": "224956977",
+              "title": "音视频本地会议功能改版",
+              "type": "page",
+              "slug": "音视频本地会议功能改版",
+              "children": [
+                {
+                  "id": "243387127",
+                  "title": "一键会议部分细节",
+                  "type": "page",
+                  "slug": "一键会议部分细节",
+                  "children": []
+                },
+                {
+                  "id": "224957271",
+                  "title": "界面设计",
+                  "type": "page",
+                  "slug": "界面设计",
+                  "children": []
+                },
+                {
+                  "id": "243388987",
+                  "title": "草稿",
+                  "type": "page",
+                  "slug": "草稿",
+                  "children": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "243392474",
+          "title": "2026年项目",
+          "type": "page",
+          "slug": "2026年项目",
+          "children": [
+            {
+              "id": "243392476",
+              "title": "FTTR中控屏产品",
+              "type": "page",
+              "slug": "FTTR中控屏产品",
+              "children": [
+                {
+                  "id": "243392479",
+                  "title": "客户需求分析与工作量评估",
+                  "type": "page",
+                  "slug": "客户需求分析与工作量评估",
+                  "children": []
+                }
+              ]
+            },
+            {
+              "id": "243392625",
+              "title": "话机合规性（意大利市场法规）排查",
+              "type": "page",
+              "slug": "话机合规性（意大利市场法规）排查",
+              "children": []
+            }
+          ]
+        },
+        {
+          "id": "196092539",
+          "title": "Android软件OEM规则",
+          "type": "page",
+          "slug": "Android软件OEM规则",
+          "children": [
+            {
+              "id": "196092554",
+              "title": "OEM规格说明",
+              "type": "page",
+              "slug": "OEM规格说明",
+              "children": []
+            }
+          ]
+        },
+        {
+          "id": "238294817",
+          "title": "Htek Android SDK变更",
+          "type": "page",
+          "slug": "Htek Android SDK变更",
+          "children": [
+            {
+              "id": "238294818",
+              "title": "SDK变更202403",
+              "type": "page",
+              "slug": "SDK变更202403",
+              "children": []
+            },
+            {
+              "id": "238294819",
+              "title": "SDK变更202404",
+              "type": "page",
+              "slug": "SDK变更202404",
+              "children": []
+            }
+          ]
+        },
+        {
+          "id": "220465804",
+          "title": "RK分区使用管理",
+          "type": "page",
+          "slug": "RK分区使用管理",
+          "children": [
+            {
+              "id": "238291705",
+              "title": "RK分区相关的若干文件",
+              "type": "page",
+              "slug": "RK分区相关的若干文件",
+              "children": []
+            }
+          ]
+        },
+        {
+          "id": "166723673",
+          "title": "V20 & V22 Image烧录与系统签名",
+          "type": "page",
+          "slug": "V20 & V22 Image烧录与系统签名",
+          "children": []
+        },
+        {
+          "id": "21825119",
+          "title": "开发",
+          "type": "page",
+          "slug": "开发",
+          "children": [
+            {
+              "id": "82608389",
+              "title": "Android Binder机制",
+              "type": "page",
+              "slug": "Android Binder机制",
+              "children": []
+            },
+            {
+              "id": "86867993",
+              "title": "Android 开发板开发工具手册",
+              "type": "page",
+              "slug": "Android 开发板开发工具手册",
+              "children": []
+            },
+            {
+              "id": "60522591",
+              "title": "Android编译环境搭建和代码编译",
+              "type": "page",
+              "slug": "Android编译环境搭建和代码编译",
+              "children": []
+            },
+            {
+              "id": "181048848",
+              "title": "Android话机音频策略",
+              "type": "page",
+              "slug": "Android话机音频策略",
+              "children": []
+            },
+            {
+              "id": "224952866",
+              "title": "Android适配三方摘挂机配置文件加解密",
+              "type": "page",
+              "slug": "Android适配三方摘挂机配置文件加解密",
+              "children": []
+            },
+            {
+              "id": "64782498",
+              "title": "Android项目代码提交流程",
+              "type": "page",
+              "slug": "Android项目代码提交流程",
+              "children": []
+            },
+            {
+              "id": "60522631",
+              "title": "Android项目分支信息",
+              "type": "page",
+              "slug": "Android项目分支信息",
+              "children": []
+            },
+            {
+              "id": "174260953",
+              "title": "Debug相关",
+              "type": "page",
+              "slug": "Debug相关",
+              "children": []
+            },
+            {
+              "id": "63668278",
+              "title": "Docker编译环境——Android篇",
+              "type": "page",
+              "slug": "Docker编译环境——Android篇",
+              "children": []
+            },
+            {
+              "id": "60522510",
+              "title": "HOS版本与分支管理",
+              "type": "page",
+              "slug": "HOS版本与分支管理",
+              "children": []
+            },
+            {
+              "id": "82608415",
+              "title": "Handler介绍",
+              "type": "page",
+              "slug": "Handler介绍",
+              "children": []
+            },
+            {
+              "id": "172917011",
+              "title": "Htek 版本号规则",
+              "type": "page",
+              "slug": "Htek 版本号规则",
+              "children": []
+            },
+            {
+              "id": "82608411",
+              "title": "Looper原理",
+              "type": "page",
+              "slug": "Looper原理",
+              "children": []
+            },
+            {
+              "id": "170852447",
+              "title": "RK Audio3A调试相关",
+              "type": "page",
+              "slug": "RK Audio3A调试相关",
+              "children": []
+            },
+            {
+              "id": "83525759",
+              "title": "SIP通告机制（Notify）",
+              "type": "page",
+              "slug": "SIP通告机制（Notify）",
+              "children": []
+            },
+            {
+              "id": "162498777",
+              "title": "UC20硬件功能测试",
+              "type": "page",
+              "slug": "UC20硬件功能测试",
+              "children": []
+            },
+            {
+              "id": "74940554",
+              "title": "使用AndroidStudio导入源码",
+              "type": "page",
+              "slug": "使用AndroidStudio导入源码",
+              "children": []
+            },
+            {
+              "id": "64782507",
+              "title": "如何使用Gerrit来进行CodeReview",
+              "type": "page",
+              "slug": "如何使用Gerrit来进行CodeReview",
+              "children": []
+            },
+            {
+              "id": "21825123",
+              "title": "开发环境需求",
+              "type": "page",
+              "slug": "开发环境需求",
+              "children": []
+            },
+            {
+              "id": "162500678",
+              "title": "待办列表",
+              "type": "page",
+              "slug": "待办列表",
+              "children": []
+            },
+            {
+              "id": "47710306",
+              "title": "硬件选型",
+              "type": "page",
+              "slug": "硬件选型",
+              "children": []
+            },
+            {
+              "id": "21827272",
+              "title": "软件开发必读",
+              "type": "page",
+              "slug": "软件开发必读",
+              "children": []
+            },
+            {
+              "id": "181051068",
+              "title": "通话控制按钮指派 (softkey layout)",
+              "type": "page",
+              "slug": "通话控制按钮指派 (softkey layout)",
+              "children": []
+            }
+          ]
+        },
+        {
+          "id": "232431373",
+          "title": "提供客户Voip源码的若干注意事项",
+          "type": "page",
+          "slug": "提供客户Voip源码的若干注意事项",
+          "children": []
+        },
+        {
+          "id": "202216364",
+          "title": "模块与功能",
+          "type": "page",
+          "slug": "模块与功能",
+          "children": [
+            {
+              "id": "206472412",
+              "title": "电话本",
+              "type": "page",
+              "slug": "电话本",
+              "children": [
+                {
+                  "id": "206472414",
+                  "title": "BMU",
+                  "type": "page",
+                  "slug": "BMU",
+                  "children": []
+                }
+              ]
+            },
+            {
+              "id": "202216366",
+              "title": "通话录音",
+              "type": "page",
+              "slug": "通话录音",
+              "children": []
+            }
+          ]
+        },
+        {
+          "id": "21825121",
+          "title": "测试",
+          "type": "page",
+          "slug": "测试",
+          "children": []
+        },
+        {
+          "id": "48758994",
+          "title": "硬件",
+          "type": "page",
+          "slug": "硬件",
+          "children": [
+            {
+              "id": "56328265",
+              "title": "RK3399相关资料",
+              "type": "page",
+              "slug": "RK3399相关资料",
+              "children": []
+            },
+            {
+              "id": "56328258",
+              "title": "UC927（视频话机）关键器件选型表（更新中）",
+              "type": "page",
+              "slug": "UC927（视频话机）关键器件选型表（更新中）",
+              "children": []
+            },
+            {
+              "id": "56328255",
+              "title": "UC927（视频话机）硬件功能框图",
+              "type": "page",
+              "slug": "UC927（视频话机）硬件功能框图",
+              "children": []
+            }
+          ]
+        },
+        {
+          "id": "167444760",
+          "title": "视频话机第一阶段小节",
+          "type": "page",
+          "slug": "视频话机第一阶段小节",
+          "children": []
+        },
+        {
+          "id": "174261433",
+          "title": "视频话机第二阶段小节",
+          "type": "page",
+          "slug": "视频话机第二阶段小节",
+          "children": []
+        },
+        {
+          "id": "48758878",
+          "title": "设计",
+          "type": "page",
+          "slug": "设计",
+          "children": [
+            {
+              "id": "104693828",
+              "title": "APP调整方案",
+              "type": "page",
+              "slug": "APP调整方案",
+              "children": [
+                {
+                  "id": "104235009",
+                  "title": "Dialer调整方案",
+                  "type": "page",
+                  "slug": "Dialer调整方案",
+                  "children": []
+                },
+                {
+                  "id": "112820349",
+                  "title": "InCall 调整方案",
+                  "type": "page",
+                  "slug": "InCall 调整方案",
+                  "children": []
+                },
+                {
+                  "id": "119373899",
+                  "title": "剩余feature统计",
+                  "type": "page",
+                  "slug": "剩余feature统计",
+                  "children": []
+                },
+                {
+                  "id": "90636383",
+                  "title": "设置调整方案",
+                  "type": "page",
+                  "slug": "设置调整方案",
+                  "children": []
+                }
+              ]
+            },
+            {
+              "id": "181043456",
+              "title": "OEM定制方案",
+              "type": "page",
+              "slug": "OEM定制方案",
+              "children": []
+            },
+            {
+              "id": "193429730",
+              "title": "SDK",
+              "type": "page",
+              "slug": "SDK",
+              "children": [
+                {
+                  "id": "220465567",
+                  "title": "Bth SDK User Guide",
+                  "type": "page",
+                  "slug": "Bth SDK User Guide",
+                  "children": []
+                },
+                {
+                  "id": "193429886",
+                  "title": "Sys SDK User Guide",
+                  "type": "page",
+                  "slug": "Sys SDK User Guide",
+                  "children": []
+                },
+                {
+                  "id": "210471530",
+                  "title": "Voip SDK User Guide",
+                  "type": "page",
+                  "slug": "Voip SDK User Guide",
+                  "children": []
+                },
+                {
+                  "id": "193429872",
+                  "title": "签名机制",
+                  "type": "page",
+                  "slug": "签名机制",
+                  "children": []
+                }
+              ]
+            },
+            {
+              "id": "181043790",
+              "title": "UI 交互演进",
+              "type": "page",
+              "slug": "UI 交互演进",
+              "children": [
+                {
+                  "id": "181043798",
+                  "title": "CALL APP",
+                  "type": "page",
+                  "slug": "CALL APP",
+                  "children": []
+                },
+                {
+                  "id": "181043793",
+                  "title": "Launcher",
+                  "type": "page",
+                  "slug": "Launcher",
+                  "children": []
+                },
+                {
+                  "id": "181043795",
+                  "title": "PhoneAPP",
+                  "type": "page",
+                  "slug": "PhoneAPP",
+                  "children": []
+                },
+                {
+                  "id": "181043800",
+                  "title": "Settings APP",
+                  "type": "page",
+                  "slug": "Settings APP",
+                  "children": []
+                }
+              ]
+            },
+            {
+              "id": "50692300",
+              "title": "VOIP重构方案",
+              "type": "page",
+              "slug": "VOIP重构方案",
+              "children": [
+                {
+                  "id": "52691212",
+                  "title": "Htek Framework Interface 设计",
+                  "type": "page",
+                  "slug": "Htek Framework Interface 设计",
+                  "children": [
+                    {
+                      "id": "52691224",
+                      "title": "Account",
+                      "type": "page",
+                      "slug": "Account",
+                      "children": []
+                    },
+                    {
+                      "id": "54067301",
+                      "title": "Call",
+                      "type": "page",
+                      "slug": "Call",
+                      "children": []
+                    },
+                    {
+                      "id": "54067305",
+                      "title": "Phone",
+                      "type": "page",
+                      "slug": "Phone",
+                      "children": []
+                    },
+                    {
+                      "id": "52691214",
+                      "title": "Settings and Provider",
+                      "type": "page",
+                      "slug": "Settings and Provider",
+                      "children": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "210471533",
+              "title": "Voip重构202212",
+              "type": "page",
+              "slug": "Voip重构202212",
+              "children": []
+            },
+            {
+              "id": "48758880",
+              "title": "软件架构设计",
+              "type": "page",
+              "slug": "软件架构设计",
+              "children": []
+            }
+          ]
+        },
+        {
+          "id": "48758873",
+          "title": "调研",
+          "type": "page",
+          "slug": "调研",
+          "children": [
+            {
+              "id": "47710314",
+              "title": "硬件平台选型",
+              "type": "page",
+              "slug": "硬件平台选型",
+              "children": []
+            }
+          ]
+        },
+        {
+          "id": "160661604",
+          "title": "需求",
+          "type": "page",
+          "slug": "需求",
+          "children": [
+            {
+              "id": "210470215",
+              "title": "2N 功能",
+              "type": "page",
+              "slug": "2N 功能",
+              "children": []
+            },
+            {
+              "id": "170262735",
+              "title": "BW Backlog",
+              "type": "page",
+              "slug": "BW Backlog",
+              "children": []
+            },
+            {
+              "id": "170262719",
+              "title": "CIP Backlog",
+              "type": "page",
+              "slug": "CIP Backlog",
+              "children": []
+            },
+            {
+              "id": "160661725",
+              "title": "PhoneLock",
+              "type": "page",
+              "slug": "PhoneLock",
+              "children": []
+            },
+            {
+              "id": "160661727",
+              "title": "Settings",
+              "type": "page",
+              "slug": "Settings",
+              "children": []
+            },
+            {
+              "id": "168853760",
+              "title": "视频话机Product Backlog",
+              "type": "page",
+              "slug": "视频话机Product Backlog",
+              "children": []
+            },
+            {
+              "id": "168853529",
+              "title": "视频话机需求调研",
+              "type": "page",
+              "slug": "视频话机需求调研",
+              "children": [
+                {
+                  "id": "168853597",
+                  "title": "Accessories",
+                  "type": "page",
+                  "slug": "Accessories",
+                  "children": []
+                },
+                {
+                  "id": "168853588",
+                  "title": "Audio",
+                  "type": "page",
+                  "slug": "Audio",
+                  "children": []
+                },
+                {
+                  "id": "168853593",
+                  "title": "Bluetooth",
+                  "type": "page",
+                  "slug": "Bluetooth",
+                  "children": []
+                },
+                {
+                  "id": "168853579",
+                  "title": "Call History",
+                  "type": "page",
+                  "slug": "Call History",
+                  "children": []
+                },
+                {
+                  "id": "168853531",
+                  "title": "Call Service",
+                  "type": "page",
+                  "slug": "Call Service",
+                  "children": []
+                },
+                {
+                  "id": "168853591",
+                  "title": "Customization",
+                  "type": "page",
+                  "slug": "Customization",
+                  "children": []
+                },
+                {
+                  "id": "168853576",
+                  "title": "Directory",
+                  "type": "page",
+                  "slug": "Directory",
+                  "children": []
+                },
+                {
+                  "id": "168853599",
+                  "title": "Maintaining the Phone",
+                  "type": "page",
+                  "slug": "Maintaining the Phone",
+                  "children": []
+                },
+                {
+                  "id": "168853533",
+                  "title": "Network",
+                  "type": "page",
+                  "slug": "Network",
+                  "children": [
+                    {
+                      "id": "168853914",
+                      "title": "DHCP option支持",
+                      "type": "page",
+                      "slug": "DHCP option支持",
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "id": "168853542",
+                  "title": "Phone Provision",
+                  "type": "page",
+                  "slug": "Phone Provision",
+                  "children": []
+                },
+                {
+                  "id": "168853574",
+                  "title": "SIP Account",
+                  "type": "page",
+                  "slug": "SIP Account",
+                  "children": []
+                },
+                {
+                  "id": "168853570",
+                  "title": "Security",
+                  "type": "page",
+                  "slug": "Security",
+                  "children": []
+                },
+                {
+                  "id": "168853603",
+                  "title": "Troubleshooting Methods",
+                  "type": "page",
+                  "slug": "Troubleshooting Methods",
+                  "children": []
+                },
+                {
+                  "id": "168853582",
+                  "title": "Voice Quality",
+                  "type": "page",
+                  "slug": "Voice Quality",
+                  "children": []
+                },
+                {
+                  "id": "168853595",
+                  "title": "Wireless Network",
+                  "type": "page",
+                  "slug": "Wireless Network",
+                  "children": []
+                }
+              ]
+            },
+            {
+              "id": "160661606",
+              "title": "通话功能",
+              "type": "page",
+              "slug": "通话功能",
+              "children": [
+                {
+                  "id": "160661608",
+                  "title": "基础功能",
+                  "type": "page",
+                  "slug": "基础功能",
+                  "children": []
+                },
+                {
+                  "id": "160661610",
+                  "title": "高级功能",
+                  "type": "page",
+                  "slug": "高级功能",
+                  "children": []
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "21825104",
+      "title": "项目管理",
+      "type": "page",
+      "slug": "项目管理",
+      "children": [
+        {
+          "id": "21825137",
+          "title": "成本",
+          "type": "page",
+          "slug": "成本",
+          "children": []
+        },
+        {
+          "id": "21825127",
+          "title": "整合",
+          "type": "page",
+          "slug": "整合",
+          "children": [
+            {
+              "id": "21825021",
+              "title": "Android 话机项目章程",
+              "type": "page",
+              "slug": "Android 话机项目章程",
+              "children": []
+            },
+            {
+              "id": "56852546",
+              "title": "UI敏捷开发",
+              "type": "page",
+              "slug": "UI敏捷开发",
+              "children": [
+                {
+                  "id": "64782350",
+                  "title": "Sprint1(2019-7-1~2019-7-13)",
+                  "type": "page",
+                  "slug": "Sprint1(2019-7-1~2019-7-13)",
+                  "children": []
+                },
+                {
+                  "id": "64782355",
+                  "title": "Sprint2(2019-7-15~2019-7-27)",
+                  "type": "page",
+                  "slug": "Sprint2(2019-7-15~2019-7-27)",
+                  "children": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "21825131",
+          "title": "时间",
+          "type": "page",
+          "slug": "时间",
+          "children": [
+            {
+              "id": "76349586",
+              "title": "Week33(2019.8.12~2019.8.17)",
+              "type": "page",
+              "slug": "Week33(2019.8.12~2019.8.17)",
+              "children": []
+            },
+            {
+              "id": "81133607",
+              "title": "Week34(2019.8.19~2019.8.15)",
+              "type": "page",
+              "slug": "Week34(2019.8.19~2019.8.15)",
+              "children": []
+            },
+            {
+              "id": "81494033",
+              "title": "Week35(2019.8.26~2019.9.1)",
+              "type": "page",
+              "slug": "Week35(2019.8.26~2019.9.1)",
+              "children": []
+            },
+            {
+              "id": "87949351",
+              "title": "Week36(2019.9.2~2019.9.6)",
+              "type": "page",
+              "slug": "Week36(2019.9.2~2019.9.6)",
+              "children": []
+            },
+            {
+              "id": "87949345",
+              "title": "Week37(9.9~9.13)",
+              "type": "page",
+              "slug": "Week37(9.9~9.13)",
+              "children": []
+            },
+            {
+              "id": "90243162",
+              "title": "Week38(9.16~9.21)",
+              "type": "page",
+              "slug": "Week38(9.16~9.21)",
+              "children": []
+            },
+            {
+              "id": "93978626",
+              "title": "Week39-40(9.23~9.30)",
+              "type": "page",
+              "slug": "Week39-40(9.23~9.30)",
+              "children": []
+            },
+            {
+              "id": "98304034",
+              "title": "Week41(10.8~10.13)",
+              "type": "page",
+              "slug": "Week41(10.8~10.13)",
+              "children": []
+            },
+            {
+              "id": "101220355",
+              "title": "Week42(10.14~10.19)",
+              "type": "page",
+              "slug": "Week42(10.14~10.19)",
+              "children": []
+            },
+            {
+              "id": "104235051",
+              "title": "Week43(10.21~10.26)",
+              "type": "page",
+              "slug": "Week43(10.21~10.26)",
+              "children": []
+            },
+            {
+              "id": "107675654",
+              "title": "Week44(10.28~11.2)",
+              "type": "page",
+              "slug": "Week44(10.28~11.2)",
+              "children": []
+            },
+            {
+              "id": "21826311",
+              "title": "总体时间安排",
+              "type": "page",
+              "slug": "总体时间安排",
+              "children": []
+            }
+          ]
+        },
+        {
+          "id": "21825139",
+          "title": "沟通",
+          "type": "page",
+          "slug": "沟通",
+          "children": [
+            {
+              "id": "21825035",
+              "title": "会议纪要",
+              "type": "page",
+              "slug": "会议纪要",
+              "children": [
+                {
+                  "id": "21825034",
+                  "title": "2019-01-05 会议纪要",
+                  "type": "page",
+                  "slug": "2019-01-05 会议纪要",
+                  "children": []
+                },
+                {
+                  "id": "48759037",
+                  "title": "2019-06-10 会议纪要",
+                  "type": "page",
+                  "slug": "2019-06-10 会议纪要",
+                  "children": []
+                },
+                {
+                  "id": "50692186",
+                  "title": "2019-06-13 会议纪要",
+                  "type": "page",
+                  "slug": "2019-06-13 会议纪要",
+                  "children": []
+                },
+                {
+                  "id": "54493336",
+                  "title": "2019-06-21 会议纪要",
+                  "type": "page",
+                  "slug": "2019-06-21 会议纪要",
+                  "children": []
+                },
+                {
+                  "id": "59834407",
+                  "title": "2019-07-03 会议纪要",
+                  "type": "page",
+                  "slug": "2019-07-03 会议纪要",
+                  "children": []
+                },
+                {
+                  "id": "43090318",
+                  "title": "2019-5-30 会议纪要",
+                  "type": "page",
+                  "slug": "2019-5-30 会议纪要",
+                  "children": []
+                }
+              ]
+            },
+            {
+              "id": "50692278",
+              "title": "会议计划",
+              "type": "page",
+              "slug": "会议计划",
+              "children": []
+            }
+          ]
+        },
+        {
+          "id": "21825129",
+          "title": "范围",
+          "type": "page",
+          "slug": "范围",
+          "children": []
+        },
+        {
+          "id": "21825133",
+          "title": "质量",
+          "type": "page",
+          "slug": "质量",
+          "children": [
+            {
+              "id": "194446275",
+              "title": "视频话机软件多供应商器件兼容流程",
+              "type": "page",
+              "slug": "视频话机软件多供应商器件兼容流程",
+              "children": []
+            }
+          ]
+        },
+        {
+          "id": "26312908",
+          "title": "项目进度",
+          "type": "page",
+          "slug": "项目进度",
+          "children": [
+            {
+              "id": "181047399",
+              "title": "2022 Q4版本规划",
+              "type": "page",
+              "slug": "2022 Q4版本规划",
+              "children": [
+                {
+                  "id": "181047403",
+                  "title": "发版计划",
+                  "type": "page",
+                  "slug": "发版计划",
+                  "children": [
+                    {
+                      "id": "181050314",
+                      "title": "5.42.1.2.1 CIP版本 release notes",
+                      "type": "page",
+                      "slug": "5.42.1.2.1 CIP版本 release notes",
+                      "children": []
+                    },
+                    {
+                      "id": "189038633",
+                      "title": "5.42.1.3.0 CIP版本 release notes",
+                      "type": "page",
+                      "slug": "5.42.1.3.0 CIP版本 release notes",
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "id": "181047401",
+                  "title": "待办事项",
+                  "type": "page",
+                  "slug": "待办事项",
+                  "children": []
+                }
+              ]
+            },
+            {
+              "id": "206472376",
+              "title": "2023 Q4规划",
+              "type": "page",
+              "slug": "2023 Q4规划",
+              "children": []
+            },
+            {
+              "id": "87294028",
+              "title": "WBS",
+              "type": "page",
+              "slug": "WBS",
+              "children": []
+            },
+            {
+              "id": "77234278",
+              "title": "工作量估算",
+              "type": "page",
+              "slug": "工作量估算",
+              "children": []
+            },
+            {
+              "id": "170852358",
+              "title": "视频话机第二阶段进度计划草稿",
+              "type": "page",
+              "slug": "视频话机第二阶段进度计划草稿",
+              "children": []
+            },
+            {
+              "id": "146114137",
+              "title": "进度沟通",
+              "type": "page",
+              "slug": "进度沟通",
+              "children": [
+                {
+                  "id": "146114139",
+                  "title": "1.25 ~ 1.31",
+                  "type": "page",
+                  "slug": "1.25 ~ 1.31",
+                  "children": []
+                },
+                {
+                  "id": "146114141",
+                  "title": "2.1 ~ 2.7",
+                  "type": "page",
+                  "slug": "2.1 ~ 2.7",
+                  "children": []
+                }
+              ]
+            },
+            {
+              "id": "87294033",
+              "title": "进度计划",
+              "type": "page",
+              "slug": "进度计划",
+              "children": []
+            }
+          ]
+        },
+        {
+          "id": "21825135",
+          "title": "风险",
+          "type": "page",
+          "slug": "风险",
+          "children": [
+            {
+              "id": "21826303",
+              "title": "风险登记册",
+              "type": "page",
+              "slug": "风险登记册",
+              "children": []
+            },
+            {
+              "id": "21826301",
+              "title": "风险管理计划",
+              "type": "page",
+              "slug": "风险管理计划",
+              "children": []
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

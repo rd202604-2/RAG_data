@@ -1,0 +1,393 @@
+{
+  "id": "243369443",
+  "title": "王平的主页",
+  "type": "page",
+  "slug": "王平的主页",
+  "children": [
+    {
+      "id": "243389214",
+      "title": "产品参数对比",
+      "type": "page",
+      "slug": "产品参数对比",
+      "children": []
+    },
+    {
+      "id": "243389320",
+      "title": "代理&Partner",
+      "type": "page",
+      "slug": "代理&Partner",
+      "children": []
+    },
+    {
+      "id": "243385950",
+      "title": "友商价格",
+      "type": "page",
+      "slug": "友商价格",
+      "children": [
+        {
+          "id": "243385961",
+          "title": "Fanvil价格",
+          "type": "page",
+          "slug": "Fanvil价格",
+          "children": []
+        },
+        {
+          "id": "243385959",
+          "title": "Snom价格",
+          "type": "page",
+          "slug": "Snom价格",
+          "children": []
+        },
+        {
+          "id": "243385957",
+          "title": "Yealink价格",
+          "type": "page",
+          "slug": "Yealink价格",
+          "children": []
+        },
+        {
+          "id": "243385953",
+          "title": "潮流价格",
+          "type": "page",
+          "slug": "潮流价格",
+          "children": []
+        }
+      ]
+    },
+    {
+      "id": "243371658",
+      "title": "周报",
+      "type": "page",
+      "slug": "周报",
+      "children": [
+        {
+          "id": "243372752",
+          "title": "5.26-5.30周报",
+          "type": "page",
+          "slug": "5.26-5.30周报",
+          "children": []
+        },
+        {
+          "id": "243374996",
+          "title": "6.16-6.20周报",
+          "type": "page",
+          "slug": "6.16-6.20周报",
+          "children": []
+        },
+        {
+          "id": "243375876",
+          "title": "6.23-6.27周报",
+          "type": "page",
+          "slug": "6.23-6.27周报",
+          "children": []
+        },
+        {
+          "id": "243373225",
+          "title": "6.3-6.6周报",
+          "type": "page",
+          "slug": "6.3-6.6周报",
+          "children": []
+        },
+        {
+          "id": "243376643",
+          "title": "6.30-7.4周报",
+          "type": "page",
+          "slug": "6.30-7.4周报",
+          "children": []
+        },
+        {
+          "id": "243374074",
+          "title": "6.9-6.13周报",
+          "type": "page",
+          "slug": "6.9-6.13周报",
+          "children": []
+        },
+        {
+          "id": "243378528",
+          "title": "7.14-7.18",
+          "type": "page",
+          "slug": "7.14-7.18",
+          "children": []
+        },
+        {
+          "id": "243379501",
+          "title": "7.21-7.25",
+          "type": "page",
+          "slug": "7.21-7.25",
+          "children": []
+        },
+        {
+          "id": "243380211",
+          "title": "7.28-8.1",
+          "type": "page",
+          "slug": "7.28-8.1",
+          "children": []
+        },
+        {
+          "id": "243377531",
+          "title": "7.7-7.11周报",
+          "type": "page",
+          "slug": "7.7-7.11周报",
+          "children": []
+        },
+        {
+          "id": "243382355",
+          "title": "8.20-8.22",
+          "type": "page",
+          "slug": "8.20-8.22",
+          "children": []
+        },
+        {
+          "id": "243381038",
+          "title": "8.4-8.8",
+          "type": "page",
+          "slug": "8.4-8.8",
+          "children": []
+        }
+      ]
+    },
+    {
+      "id": "243376418",
+      "title": "基本情况",
+      "type": "page",
+      "slug": "基本情况",
+      "children": []
+    },
+    {
+      "id": "243376563",
+      "title": "市场情况",
+      "type": "page",
+      "slug": "市场情况",
+      "children": []
+    },
+    {
+      "id": "243379842",
+      "title": "意大利",
+      "type": "page",
+      "slug": "意大利",
+      "children": [
+        {
+          "id": "243380688",
+          "title": "主流PBX&友商代理",
+          "type": "page",
+          "slug": "主流PBX&友商代理",
+          "children": []
+        },
+        {
+          "id": "243380686",
+          "title": "代理的客户",
+          "type": "page",
+          "slug": "代理的客户",
+          "children": []
+        },
+        {
+          "id": "243380504",
+          "title": "意大利PBX",
+          "type": "page",
+          "slug": "意大利PBX",
+          "children": []
+        }
+      ]
+    },
+    {
+      "id": "243386445",
+      "title": "摩洛哥",
+      "type": "page",
+      "slug": "摩洛哥",
+      "children": []
+    },
+    {
+      "id": "243377347",
+      "title": "文件材料",
+      "type": "page",
+      "slug": "文件材料",
+      "children": [
+        {
+          "id": "243378444",
+          "title": "CRM创建订单",
+          "type": "page",
+          "slug": "CRM创建订单",
+          "children": []
+        },
+        {
+          "id": "243379172",
+          "title": "Inquiry Sheet",
+          "type": "page",
+          "slug": "Inquiry Sheet",
+          "children": []
+        },
+        {
+          "id": "243378460",
+          "title": "JIRA市场事务库OEM资料",
+          "type": "page",
+          "slug": "JIRA市场事务库OEM资料",
+          "children": []
+        },
+        {
+          "id": "243377381",
+          "title": "OEM&ODM",
+          "type": "page",
+          "slug": "OEM&ODM",
+          "children": []
+        },
+        {
+          "id": "243377353",
+          "title": "PI",
+          "type": "page",
+          "slug": "PI",
+          "children": []
+        },
+        {
+          "id": "243379069",
+          "title": "产品文件",
+          "type": "page",
+          "slug": "产品文件",
+          "children": []
+        },
+        {
+          "id": "243381265",
+          "title": "发货资料模板",
+          "type": "page",
+          "slug": "发货资料模板",
+          "children": []
+        },
+        {
+          "id": "243386592",
+          "title": "对比表",
+          "type": "page",
+          "slug": "对比表",
+          "children": []
+        },
+        {
+          "id": "243381912",
+          "title": "报价单",
+          "type": "page",
+          "slug": "报价单",
+          "children": []
+        },
+        {
+          "id": "243378472",
+          "title": "邮件签名如何改",
+          "type": "page",
+          "slug": "邮件签名如何改",
+          "children": []
+        }
+      ]
+    },
+    {
+      "id": "243379162",
+      "title": "罗马尼亚",
+      "type": "page",
+      "slug": "罗马尼亚",
+      "children": [
+        {
+          "id": "243379198",
+          "title": "老客户情况",
+          "type": "page",
+          "slug": "老客户情况",
+          "children": []
+        }
+      ]
+    },
+    {
+      "id": "243378124",
+      "title": "行业信息",
+      "type": "page",
+      "slug": "行业信息",
+      "children": [
+        {
+          "id": "243378127",
+          "title": "2025.7.15年中汇报",
+          "type": "page",
+          "slug": "2025.7.15年中汇报",
+          "children": []
+        },
+        {
+          "id": "243384062",
+          "title": "Review＋周会",
+          "type": "page",
+          "slug": "Review＋周会",
+          "children": []
+        }
+      ]
+    },
+    {
+      "id": "243378469",
+      "title": "销售知识",
+      "type": "page",
+      "slug": "销售知识",
+      "children": [
+        {
+          "id": "243390176",
+          "title": "OEM定制规则",
+          "type": "page",
+          "slug": "OEM定制规则",
+          "children": []
+        },
+        {
+          "id": "243383880",
+          "title": "SMART, FABE, AIDMAS原则",
+          "type": "page",
+          "slug": "SMART, FABE, AIDMAS原则",
+          "children": []
+        },
+        {
+          "id": "243386439",
+          "title": "专业术语",
+          "type": "page",
+          "slug": "专业术语",
+          "children": []
+        },
+        {
+          "id": "243389316",
+          "title": "兼容的PBX",
+          "type": "page",
+          "slug": "兼容的PBX",
+          "children": []
+        },
+        {
+          "id": "243378534",
+          "title": "客户类型",
+          "type": "page",
+          "slug": "客户类型",
+          "children": []
+        },
+        {
+          "id": "243379836",
+          "title": "对比友商优势点",
+          "type": "page",
+          "slug": "对比友商优势点",
+          "children": []
+        },
+        {
+          "id": "243379930",
+          "title": "开发客户途径",
+          "type": "page",
+          "slug": "开发客户途径",
+          "children": []
+        },
+        {
+          "id": "243379064",
+          "title": "报价前需了解的信息",
+          "type": "page",
+          "slug": "报价前需了解的信息",
+          "children": []
+        },
+        {
+          "id": "257001853",
+          "title": "项目需要了解的信息",
+          "type": "page",
+          "slug": "项目需要了解的信息",
+          "children": []
+        }
+      ]
+    },
+    {
+      "id": "257002171",
+      "title": "领英被封怎么办",
+      "type": "page",
+      "slug": "领英被封怎么办",
+      "children": []
+    }
+  ]
+}

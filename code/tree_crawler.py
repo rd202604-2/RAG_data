@@ -3,6 +3,10 @@
 """
 Confluence Server 页面树抓取（代码 A）
 依赖：crawl4ai、playwright（与现有项目一致）
+
+断点续爬（手动 page_id）：使用 --resume-from-page-id，从该页作为「子树根」开始递归
+抓取整棵子树并写入 -o；无需自动 checkpoint。若同时写了位置参数 root_page_id，将忽略
+root_page_id。
 """
 
 from __future__ import annotations
@@ -281,7 +285,12 @@ async def warmup_crawler_session(crawler, base_url: str, logger: logging.Logger)
 
 async def async_main() -> int:
     parser = argparse.ArgumentParser(description="Confluence 页面树导出为 page_tree.json")
-    parser.add_argument("root_page_id", help="根页面 page id")
+    parser.add_argument(
+        "root_page_id",
+        nargs="?",
+        default=None,
+        help="根页面 page id；与 --resume-from-page-id 二选一即可（同时给出时以断点 id 为准）",
+    )
     parser.add_argument(
         "-o",
         "--output",
@@ -306,6 +315,15 @@ async def async_main() -> int:
         default=None,
         help="checkpoint 文件路径（默认: <output>.checkpoint.json）",
     )
+    parser.add_argument(
+        "--resume-from-page-id",
+        default=None,
+        metavar="PAGE_ID",
+        help=(
+            "从手动指定的 page_id 作为子树根开始抓取（输出为该页的整棵子树 JSON）；"
+            "可不写位置参数 root_page_id。与位置参数同时给出时忽略 root_page_id"
+        ),
+    )
     args = parser.parse_args()
 
     logger = setup_logging(args.verbose)
@@ -315,6 +333,23 @@ async def async_main() -> int:
     if not base_url:
         logger.error("请设置环境变量 CONFLUENCE_BASE_URL")
         return 2
+
+    resume_id = (args.resume_from_page_id or "").strip()
+    root_id = (args.root_page_id or "").strip()
+    if resume_id:
+        start_page_id = resume_id
+        if root_id:
+            logger.info(
+                "已指定 --resume-from-page-id=%s，将从此页作为子树根抓取；忽略位置参数 root_page_id=%s",
+                resume_id,
+                root_id,
+            )
+    elif root_id:
+        start_page_id = root_id
+    else:
+        logger.error("请提供 root_page_id，或使用 --resume-from-page-id PAGE_ID")
+        return 2
+
     checkpoint_path = (
         args.checkpoint_path if args.checkpoint_path else f"{args.output}.checkpoint.json"
     )
@@ -352,7 +387,7 @@ async def async_main() -> int:
             root = await build_subtree(
                 context,
                 base_url,
-                str(args.root_page_id),
+                start_page_id,
                 logger,
                 depth=0,
                 max_depth=args.max_depth,

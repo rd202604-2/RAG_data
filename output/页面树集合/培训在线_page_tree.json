@@ -1,0 +1,470 @@
+{
+  "id": "5472263",
+  "title": "培训在线",
+  "type": "page",
+  "slug": "培训在线",
+  "children": [
+    {
+      "id": "5472273",
+      "title": "Wiki和JIRA使用帮助",
+      "type": "page",
+      "slug": "Wiki和JIRA使用帮助",
+      "children": [
+        {
+          "id": "5472283",
+          "title": "CRM",
+          "type": "page",
+          "slug": "CRM",
+          "children": []
+        },
+        {
+          "id": "5472281",
+          "title": "Jira",
+          "type": "page",
+          "slug": "Jira",
+          "children": [
+            {
+              "id": "7962625",
+              "title": "用jira管理项目",
+              "type": "page",
+              "slug": "用jira管理项目",
+              "children": [
+                {
+                  "id": "7208980",
+                  "title": "HR项目管理",
+                  "type": "page",
+                  "slug": "HR项目管理",
+                  "children": []
+                },
+                {
+                  "id": "7634945",
+                  "title": "Marketing campaign管理",
+                  "type": "page",
+                  "slug": "Marketing campaign管理",
+                  "children": []
+                },
+                {
+                  "id": "7208969",
+                  "title": "任务管理",
+                  "type": "page",
+                  "slug": "任务管理",
+                  "children": []
+                },
+                {
+                  "id": "7634954",
+                  "title": "公司法务管理",
+                  "type": "page",
+                  "slug": "公司法务管理",
+                  "children": []
+                },
+                {
+                  "id": "7208982",
+                  "title": "公司运营管理",
+                  "type": "page",
+                  "slug": "公司运营管理",
+                  "children": []
+                },
+                {
+                  "id": "7208975",
+                  "title": "流程管理",
+                  "type": "page",
+                  "slug": "流程管理",
+                  "children": []
+                },
+                {
+                  "id": "7208978",
+                  "title": "财务项目管理",
+                  "type": "page",
+                  "slug": "财务项目管理",
+                  "children": []
+                },
+                {
+                  "id": "7208972",
+                  "title": "项目管理",
+                  "type": "page",
+                  "slug": "项目管理",
+                  "children": []
+                }
+              ]
+            },
+            {
+              "id": "7962629",
+              "title": "Jira使用指南",
+              "type": "page",
+              "slug": "Jira使用指南",
+              "children": [
+                {
+                  "id": "8716308",
+                  "title": "How do I build the workflow I want?",
+                  "type": "page",
+                  "slug": "How do I build the workflow I want_",
+                  "children": []
+                },
+                {
+                  "id": "7962631",
+                  "title": "JIRA使用一--创建看板（Board）",
+                  "type": "page",
+                  "slug": "JIRA使用一--创建看板（Board）",
+                  "children": []
+                },
+                {
+                  "id": "7962645",
+                  "title": "Jira工作流项目设置操作指南",
+                  "type": "page",
+                  "slug": "Jira工作流项目设置操作指南",
+                  "children": []
+                },
+                {
+                  "id": "7962671",
+                  "title": "Jira建立Bug管理工作流并关联项目",
+                  "type": "page",
+                  "slug": "Jira建立Bug管理工作流并关联项目",
+                  "children": []
+                },
+                {
+                  "id": "7962673",
+                  "title": "图解利用Jira对Scrum项目进行跟踪管理(一)",
+                  "type": "page",
+                  "slug": "图解利用Jira对Scrum项目进行跟踪管理(一)",
+                  "children": []
+                },
+                {
+                  "id": "7962675",
+                  "title": "图解利用Jira对Scrum项目进行跟踪管理(二)",
+                  "type": "page",
+                  "slug": "图解利用Jira对Scrum项目进行跟踪管理(二)",
+                  "children": []
+                },
+                {
+                  "id": "7962678",
+                  "title": "给JIRA的工作流的每一个动作设置权限",
+                  "type": "page",
+                  "slug": "给JIRA的工作流的每一个动作设置权限",
+                  "children": []
+                }
+              ]
+            },
+            {
+              "id": "9338881",
+              "title": "Htek配置文件说明",
+              "type": "page",
+              "slug": "Htek配置文件说明",
+              "children": [
+                {
+                  "id": "9338913",
+                  "title": "Jira的定制使用",
+                  "type": "page",
+                  "slug": "Jira的定制使用",
+                  "children": []
+                },
+                {
+                  "id": "9338923",
+                  "title": "Jira-汉隆任务跟踪系统使用指南",
+                  "type": "page",
+                  "slug": "Jira-汉隆任务跟踪系统使用指南",
+                  "children": []
+                },
+                {
+                  "id": "9338884",
+                  "title": "HLJIRA系统配置",
+                  "type": "page",
+                  "slug": "HLJIRA系统配置",
+                  "children": []
+                }
+              ]
+            },
+            {
+              "id": "21824962",
+              "title": "JIRA培训视频",
+              "type": "page",
+              "slug": "JIRA培训视频",
+              "children": []
+            }
+          ]
+        },
+        {
+          "id": "5472275",
+          "title": "Wiki",
+          "type": "page",
+          "slug": "Wiki",
+          "children": [
+            {
+              "id": "65538",
+              "title": "9步学会编辑wiki",
+              "type": "page",
+              "slug": "9步学会编辑wiki",
+              "children": [
+                {
+                  "id": "65539",
+                  "title": "什么是Confluence?  (第1步)",
+                  "type": "page",
+                  "slug": "什么是Confluence_  (第1步)",
+                  "children": []
+                },
+                {
+                  "id": "65540",
+                  "title": "快速浏览编辑器(第2步)",
+                  "type": "page",
+                  "slug": "快速浏览编辑器(第2步)",
+                  "children": []
+                },
+                {
+                  "id": "65543",
+                  "title": "让我们编辑这个页面(第3步)",
+                  "type": "page",
+                  "slug": "让我们编辑这个页面(第3步)",
+                  "children": []
+                },
+                {
+                  "id": "65544",
+                  "title": "用图像来美化页面（第4步）",
+                  "type": "page",
+                  "slug": "用图像来美化页面（第4步）",
+                  "children": []
+                },
+                {
+                  "id": "65556",
+                  "title": "认真对待表格 (第5步)",
+                  "type": "page",
+                  "slug": "认真对待表格 (第5步)",
+                  "children": []
+                },
+                {
+                  "id": "65542",
+                  "title": "布置你的页面 (第6步)",
+                  "type": "page",
+                  "slug": "布置你的页面 (第6步)",
+                  "children": []
+                },
+                {
+                  "id": "65537",
+                  "title": "了解autoconvert的妙用(第7步)",
+                  "type": "page",
+                  "slug": "了解autoconvert的妙用(第7步)",
+                  "children": []
+                },
+                {
+                  "id": "65557",
+                  "title": "用评论告诉别人你的想法(第8步)",
+                  "type": "page",
+                  "slug": "用评论告诉别人你的想法(第8步)",
+                  "children": []
+                },
+                {
+                  "id": "65558",
+                  "title": "与团队成员分享您的页面 (第9步)",
+                  "type": "page",
+                  "slug": "与团队成员分享您的页面 (第9步)",
+                  "children": []
+                }
+              ]
+            },
+            {
+              "id": "6062151",
+              "title": "Confluence 主要特性",
+              "type": "page",
+              "slug": "Confluence 主要特性",
+              "children": []
+            },
+            {
+              "id": "6062233",
+              "title": "使用宏",
+              "type": "page",
+              "slug": "使用宏",
+              "children": []
+            }
+          ]
+        },
+        {
+          "id": "4882459",
+          "title": "案例与产品视频",
+          "type": "page",
+          "slug": "案例与产品视频",
+          "children": []
+        },
+        {
+          "id": "6062254",
+          "title": "Tips",
+          "type": "page",
+          "slug": "Tips",
+          "children": [
+            {
+              "id": "7962647",
+              "title": "Atlassian工具集和JIRA插件在敏捷项目管理中的应用实践",
+              "type": "page",
+              "slug": "Atlassian工具集和JIRA插件在敏捷项目管理中的应用实践",
+              "children": []
+            },
+            {
+              "id": "7962651",
+              "title": "Confluence 显示页面附件中的图片",
+              "type": "page",
+              "slug": "Confluence 显示页面附件中的图片",
+              "children": []
+            },
+            {
+              "id": "7962655",
+              "title": "基于JIRA的Scrum敏捷开发的项目管理",
+              "type": "page",
+              "slug": "基于JIRA的Scrum敏捷开发的项目管理",
+              "children": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "5472265",
+      "title": "产品要求",
+      "type": "page",
+      "slug": "产品要求",
+      "children": []
+    },
+    {
+      "id": "5472264",
+      "title": "会议记录",
+      "type": "page",
+      "slug": "会议记录",
+      "children": []
+    },
+    {
+      "id": "5472267",
+      "title": "决策日志",
+      "type": "page",
+      "slug": "决策日志",
+      "children": []
+    },
+    {
+      "id": "5472268",
+      "title": "回顾",
+      "type": "page",
+      "slug": "回顾",
+      "children": []
+    },
+    {
+      "id": "5472266",
+      "title": "文件列表",
+      "type": "page",
+      "slug": "文件列表",
+      "children": [
+        {
+          "id": "30901116",
+          "title": "其他",
+          "type": "page",
+          "slug": "其他",
+          "children": []
+        },
+        {
+          "id": "12453663",
+          "title": "培训文档",
+          "type": "page",
+          "slug": "培训文档",
+          "children": []
+        },
+        {
+          "id": "30901125",
+          "title": "电子书籍",
+          "type": "page",
+          "slug": "电子书籍",
+          "children": [
+            {
+              "id": "30901120",
+              "title": "销售电子书籍",
+              "type": "page",
+              "slug": "销售电子书籍",
+              "children": []
+            },
+            {
+              "id": "30901113",
+              "title": "研发电子书籍",
+              "type": "page",
+              "slug": "研发电子书籍",
+              "children": []
+            },
+            {
+              "id": "129473476",
+              "title": "管理电子书籍",
+              "type": "page",
+              "slug": "管理电子书籍",
+              "children": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "7962659",
+      "title": "Other",
+      "type": "page",
+      "slug": "Other",
+      "children": [
+        {
+          "id": "7962661",
+          "title": "职场成长",
+          "type": "page",
+          "slug": "职场成长",
+          "children": [
+            {
+              "id": "7962657",
+              "title": "从开发转型到项目经理的历程",
+              "type": "page",
+              "slug": "从开发转型到项目经理的历程",
+              "children": []
+            },
+            {
+              "id": "7962663",
+              "title": "使用Git必须要理解的GitFlow",
+              "type": "page",
+              "slug": "使用Git必须要理解的GitFlow",
+              "children": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "27297954",
+      "title": "员工培训",
+      "type": "page",
+      "slug": "员工培训",
+      "children": [
+        {
+          "id": "40009803",
+          "title": "HR培训文档",
+          "type": "page",
+          "slug": "HR培训文档",
+          "children": []
+        },
+        {
+          "id": "27297956",
+          "title": "培训总结",
+          "type": "page",
+          "slug": "培训总结",
+          "children": []
+        }
+      ]
+    },
+    {
+      "id": "29950385",
+      "title": "专题培训",
+      "type": "page",
+      "slug": "专题培训",
+      "children": [
+        {
+          "id": "36471209",
+          "title": "Docker Introduction",
+          "type": "page",
+          "slug": "Docker Introduction",
+          "children": []
+        },
+        {
+          "id": "29950387",
+          "title": "Git 简介",
+          "type": "page",
+          "slug": "Git 简介",
+          "children": []
+        }
+      ]
+    }
+  ]
+}
