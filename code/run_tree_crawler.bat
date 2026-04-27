@@ -1,8 +1,8 @@
 @echo off
 REM 设置 Confluence 环境变量
-set CONFLUENCE_BASE_URL=http://oa.htek.com:8090
-set CONFLUENCE_USERNAME=leo.lu
-set CONFLUENCE_PASSWORD=Lzh654321
+set CONFLUENCE_BASE_URL=……
+set CONFLUENCE_USERNAME=……
+set CONFLUENCE_PASSWORD=……
 
 REM 运行页面树爬虫，根页面 ID 自行设置
 python markdown_tree_export.py --resume --checkpoint output/_markdown_tree_export_checkpoint.jsonpause
