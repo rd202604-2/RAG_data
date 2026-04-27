@@ -4,9 +4,12 @@
 Confluence Server 页面树抓取（代码 A）
 依赖：crawl4ai、playwright（与现有项目一致）
 
-断点续爬（手动 page_id）：使用 --resume-from-page-id，从该页作为「子树根」开始递归
-抓取整棵子树并写入 -o；无需自动 checkpoint。若同时写了位置参数 root_page_id，将忽略
-root_page_id。
+断点续爬方式：
+- --resume-checkpoint <path>：从 checkpoint 加载整树续跑。子列表与 API 按 id 对齐；若某层
+  子页 id 集合与快照一致则跳过该页的 fetch_page_meta，仅每层拉 child/page 向下校验，
+  不一致时回退为完整拉取（根 depth=0 始终拉 meta）。可用 --no-skip-complete-snapshot 关闭快路径。
+- --resume-from-page-id：仅从该 page_id 作为子树根重抓子树；若同时给 root_page_id
+  则忽略 root。旧行为保留。
 """
 
 from __future__ import annotations
@@ -23,6 +26,11 @@ import traceback
 from urllib.parse import parse_qs, urlparse
 from typing import Any, Dict, List, Optional
 
+from confluence_env_defaults import (
+    confluence_base_url,
+    confluence_password,
+    confluence_username,
+)
 from crawl4ai import AsyncWebCrawler, BrowserConfig, CacheMode, CrawlerRunConfig
 
 # 与浏览器 Hook 之间传递 Playwright BrowserContext
@@ -89,9 +97,9 @@ async def on_page_context_created(page, context, **kwargs):
     并把 BrowserContext 存起来供 context.request 调用 REST API。
     """
     logger = logging.getLogger("tree_crawler")
-    base_url = os.environ.get("CONFLUENCE_BASE_URL", "").rstrip("/")
-    username = os.environ.get("CONFLUENCE_USERNAME", "")
-    password = os.environ.get("CONFLUENCE_PASSWORD", "")
+    base_url = confluence_base_url()
+    username = confluence_username()
+    password = confluence_password()
 
     try:
         logger.info("Hook: 开始登录流程")
@@ -176,6 +184,15 @@ async def fetch_child_pages_all(
     return aggregated
 
 
+def _child_id_sets_equal(
+    api_children: List[Dict[str, Any]], snap_children: List[Dict[str, Any]]
+) -> bool:
+    """API 子页列表与快照子节点 id 集合是否一致（顺序无关）。"""
+    api_ids = {str(x["id"]) for x in api_children if x.get("id") is not None}
+    snap_ids = {str(c.get("id")) for c in snap_children if c and c.get("id")}
+    return api_ids == snap_ids and len(api_children) == len(snap_children)
+
+
 async def build_subtree(
     context,
     base_url: str,
@@ -186,7 +203,67 @@ async def build_subtree(
     checkpoint_every: int,
     checkpoint_path: Optional[str],
     existing_node: Optional[Dict[str, Any]] = None,
+    skip_complete_snapshot: bool = False,
 ) -> Dict[str, Any]:
+    children_meta_precached: Optional[List[Dict[str, Any]]] = None
+
+    # 续跑快路径：depth>0 且快照子 id 集与 API 一致时跳过本页 fetch_page_meta，仅校验子列表后递归
+    if (
+        skip_complete_snapshot
+        and existing_node is not None
+        and depth > 0
+    ):
+        children_meta_precached = await fetch_child_pages_all(
+            context, base_url, node_id, logger
+        )
+        snap_ch0 = existing_node.get("children") or []
+        if _child_id_sets_equal(children_meta_precached, snap_ch0):
+            node = existing_node
+            if "children" not in node or node["children"] is None:
+                node["children"] = []
+            title = node.get("title") or f"page_{node_id}"
+            _PROGRESS["pages"] += 1
+            logger.info(
+                "进度(快照快路径,跳过 meta): #%d | depth=%d | id=%s | title=%s",
+                _PROGRESS["pages"],
+                depth,
+                str(node.get("id", node_id)),
+                title,
+            )
+            if checkpoint_every > 0 and _PROGRESS["pages"] % checkpoint_every == 0:
+                write_checkpoint(
+                    checkpoint_path,
+                    _CHECKPOINT_STATE.get("root") or node,
+                    logger,
+                    f"pages={_PROGRESS['pages']}",
+                )
+            if max_depth is not None and depth >= max_depth:
+                logger.warning("达到 max_depth=%s，跳过子节点: %s", max_depth, title)
+                return node
+            by_id_fast: Dict[str, Any] = {
+                str(c.get("id")): c for c in snap_ch0 if c and c.get("id")
+            }
+            new_children_fast: List[Dict[str, Any]] = []
+            for ch in children_meta_precached:
+                cid = str(ch["id"])
+                new_children_fast.append(by_id_fast[cid])
+            node["children"] = new_children_fast
+            for ch in node["children"]:
+                await build_subtree(
+                    context,
+                    base_url,
+                    str(ch["id"]),
+                    logger,
+                    depth + 1,
+                    max_depth,
+                    checkpoint_every,
+                    checkpoint_path,
+                    existing_node=ch,
+                    skip_complete_snapshot=skip_complete_snapshot,
+                )
+            return node
+        # 子列表不一致：下面走标准路径，复用 children_meta_precached，避免二次请求 child/page
+
     meta = await fetch_page_meta(context, base_url, node_id, logger)
     title = meta.get("title") or f"page_{node_id}"
     if existing_node is None:
@@ -222,30 +299,43 @@ async def build_subtree(
         logger.warning("达到 max_depth=%s，跳过子节点: %s", max_depth, title)
         return node
 
-    children_meta = await fetch_child_pages_all(context, base_url, node_id, logger)
+    if children_meta_precached is not None:
+        children_meta = children_meta_precached
+    else:
+        children_meta = await fetch_child_pages_all(context, base_url, node_id, logger)
+    if "children" not in node or node["children"] is None:
+        node["children"] = []
+    by_id: Dict[str, Any] = {
+        str(c.get("id")): c for c in (node.get("children") or []) if c and c.get("id")
+    }
+    new_children: List[Dict[str, Any]] = []
     for ch in children_meta:
         cid = str(ch["id"])
         child_title = ch.get("title") or f"page_{cid}"
-        # 先挂占位子节点，保证深度递归期间 checkpoint 能看到已发现结构。
-        node["children"].append(
-            {
+        if cid in by_id:
+            ch_node = by_id[cid]
+        else:
+            ch_node = {
                 "id": cid,
                 "title": child_title,
                 "type": ch.get("type", "page"),
                 "slug": sanitize_segment(child_title),
                 "children": [],
             }
-        )
-        subtree = await build_subtree(
+        new_children.append(ch_node)
+    node["children"] = new_children
+    for ch in node["children"]:
+        await build_subtree(
             context,
             base_url,
-            cid,
+            str(ch["id"]),
             logger,
             depth + 1,
             max_depth,
             checkpoint_every,
             checkpoint_path,
-            existing_node=node["children"][-1],
+            existing_node=ch,
+            skip_complete_snapshot=skip_complete_snapshot,
         )
     return node
 
@@ -324,19 +414,60 @@ async def async_main() -> int:
             "可不写位置参数 root_page_id。与位置参数同时给出时忽略 root_page_id"
         ),
     )
+    parser.add_argument(
+        "--resume-checkpoint",
+        default=None,
+        metavar="PATH",
+        help=(
+            "从已保存的 JSON 快照整树续跑：子页面列表与 API 按 id 对齐并补全，"
+            "不重复已存在的子节点。根 page_id 以文件中 id 为准；与 --resume-from-page-id 互斥"
+        ),
+    )
+    parser.add_argument(
+        "--no-skip-complete-snapshot",
+        action="store_true",
+        help="与 --resume-checkpoint 连用：关闭「子列表与快照一致则跳过 fetch_page_meta」的快路径",
+    )
     args = parser.parse_args()
 
     logger = setup_logging(args.verbose)
     _PROGRESS["pages"] = 0
     _CHECKPOINT_STATE["root"] = None
-    base_url = os.environ.get("CONFLUENCE_BASE_URL", "").rstrip("/")
+    base_url = confluence_base_url()
     if not base_url:
-        logger.error("请设置环境变量 CONFLUENCE_BASE_URL")
+        logger.error("Confluence 基址为空，请检查 CONFLUENCE_BASE_URL 或 confluence_env_defaults")
         return 2
 
     resume_id = (args.resume_from_page_id or "").strip()
     root_id = (args.root_page_id or "").strip()
-    if resume_id:
+    preloaded_root: Optional[Dict[str, Any]] = None
+    ckpt_resume = (args.resume_checkpoint or "").strip()
+    if ckpt_resume:
+        if resume_id:
+            logger.error("不能同时使用 --resume-checkpoint 与 --resume-from-page-id")
+            return 2
+        if not os.path.isfile(ckpt_resume):
+            logger.error("checkpoint 文件不存在: %s", os.path.abspath(ckpt_resume))
+            return 2
+        with open(ckpt_resume, encoding="utf-8") as f:
+            preloaded_root = json.load(f)
+        pid = str((preloaded_root or {}).get("id") or "").strip()
+        if not pid:
+            logger.error("checkpoint 文件缺少根节点 id 字段")
+            return 2
+        start_page_id = pid
+        if root_id and str(root_id) != pid:
+            logger.info(
+                "已指定 --resume-checkpoint，根 id 以快照为准 (%s)；忽略位置参数 root_page_id=%s",
+                pid,
+                root_id,
+            )
+        logger.info("已从快照加载整树: %s，根 id=%s", os.path.abspath(ckpt_resume), start_page_id)
+        if not args.no_skip_complete_snapshot:
+            logger.info(
+                "已启用快照快路径：子 id 集与 API 一致时跳过该页 fetch_page_meta（根页仍拉 meta）"
+            )
+    elif resume_id:
         start_page_id = resume_id
         if root_id:
             logger.info(
@@ -347,7 +478,7 @@ async def async_main() -> int:
     elif root_id:
         start_page_id = root_id
     else:
-        logger.error("请提供 root_page_id，或使用 --resume-from-page-id PAGE_ID")
+        logger.error("请提供 root_page_id，或使用 --resume-from-page-id / --resume-checkpoint")
         return 2
 
     checkpoint_path = (
@@ -374,6 +505,7 @@ async def async_main() -> int:
         ),
     )
     root: Optional[Dict[str, Any]] = None
+    skip_complete_snapshot = bool(preloaded_root) and not args.no_skip_complete_snapshot
     try:
         async with AsyncWebCrawler(config=browser_config) as crawler:
             crawler.crawler_strategy.set_hook("on_page_context_created", on_page_context_created)
@@ -393,6 +525,8 @@ async def async_main() -> int:
                 max_depth=args.max_depth,
                 checkpoint_every=args.checkpoint_every,
                 checkpoint_path=checkpoint_path,
+                existing_node=preloaded_root,
+                skip_complete_snapshot=skip_complete_snapshot,
             )
     except Exception as exc:  # noqa: BLE001
         logger.error("抓取流程异常中断: %s", exc)
@@ -420,6 +554,12 @@ async def async_main() -> int:
 
 
 def main() -> None:
+    if os.name == "nt" and hasattr(sys.stdout, "reconfigure"):
+        try:
+            sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+            sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+        except OSError:
+            pass
     try:
         raise SystemExit(asyncio.run(async_main()))
     except KeyboardInterrupt:

@@ -20,7 +20,7 @@ output 根目录下优先 AI项目_page_tree.json，否则取最新的 *page_tre
 抓取与 HTML→Markdown 流程与 code/confluence_crawl4ai.py 对齐：登录钩子使用 networkidle、
 整页 HTML 经 fix_relative_paths / handle_complex_tables / custom_markdownify（不裁切
 #main-content，尽量保留正文与评论等全部 DOM）。每页写入「节点标题.md」，resume 仍识别
-index.md。环境变量：CONFLUENCE_BASE_URL、CONFLUENCE_USERNAME、CONFLUENCE_PASSWORD。
+index.md。认证：环境变量可覆盖，未设置时与 run_tree_crawler_resume.bat 及 confluence_env_defaults 中默认一致。
 """
 
 from __future__ import annotations
@@ -40,6 +40,11 @@ from datetime import datetime
 from typing import Any, Dict, List, Optional, Set, Tuple, Union
 
 from bs4 import BeautifulSoup
+from confluence_env_defaults import (
+    confluence_base_url,
+    confluence_password,
+    confluence_username,
+)
 from crawl4ai import AsyncWebCrawler, BrowserConfig, CrawlerRunConfig, CrawlResult
 from crawl4ai.content_filter_strategy import PruningContentFilter
 from crawl4ai.markdown_generation_strategy import DefaultMarkdownGenerator
@@ -261,10 +266,7 @@ def crawler_html_to_markdown(html: str, base_url: str) -> str:
 
 
 def _login_env() -> Tuple[str, str, str]:
-    base = os.environ.get("CONFLUENCE_BASE_URL", "").rstrip("/")
-    user = os.environ.get("CONFLUENCE_USERNAME", "")
-    password = os.environ.get("CONFLUENCE_PASSWORD", "")
-    return base, user, password
+    return confluence_base_url(), confluence_username(), confluence_password()
 
 
 async def on_page_context_created(page, context, **kwargs):
@@ -878,7 +880,9 @@ async def async_main() -> int:
 
     base_url, username, password = _login_env()
     if not base_url or not username or not password:
-        logger.error("请设置环境变量 CONFLUENCE_BASE_URL、CONFLUENCE_USERNAME、CONFLUENCE_PASSWORD")
+        logger.error(
+            "Confluence 登录项为空，请设置环境变量或编辑 code/confluence_env_defaults.py"
+        )
         return 2
 
     tree_paths = resolve_tree_json_paths(args.tree_json, logger)

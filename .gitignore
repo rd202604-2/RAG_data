@@ -1,12 +1,16 @@
-log/
+# 忽略所有文件
+*
+
+# 但保留 code 目录
+!code/
+
+# 在 code 目录中，只保留 .py 文件
+code/*
+!code/*.py
+
+# 忽略 Python 缓存和日志
+__pycache__/
+*.pyc
 *.log
 .env
 .llm.env
-__pycache__/
-*.pyc
-
-# 仓库根目录：忽略除 code 和 output 以外的所有顶层文件夹
-# （不忽略根目录下的单文件，如 README.md）
-/*/
-!code/
-!output/

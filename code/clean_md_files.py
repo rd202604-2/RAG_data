@@ -1,21 +1,28 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-递归清洗 Confluence 导出的 Markdown：提取元数据为 YAML、截断尾部噪声、
-清理 UI/锚点/面包屑等，输出到新目录不覆盖源文件。
+递归清洗 Confluence 导出的 Markdown：提取元数据为 YAML、以「转至元数据起始」切掉文首壳层、
+再截断尾部 Confluence/评论区噪声，清理 UI/锚点/面包屑等，输出到新目录不覆盖源文件。
 
-默认输入：项目 output/AI项目_page_tree_md
-默认输出：项目 output/clean_md
+可选：在清洗时依据正文中的 pageId 调用 Confluence REST 列举附件并下载，同时拉取
+MD 中已有的 download/attachments 直链，去重后保存到与输出 .md 同目录。
+
+默认输入、输出见 DEFAULT_* 常量。
 """
 
 from __future__ import annotations
 
 import argparse
+import hashlib
 import logging
+import os
 import re
 import sys
+import time
+from dataclasses import dataclass
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Set, Tuple
+from urllib.parse import unquote, urlparse
 
 try:
     from tqdm import tqdm
@@ -25,22 +32,60 @@ except ImportError as e:  # pragma: no cover
         "或在 code 目录执行：pip install -r requirements.txt"
     ) from e
 
+try:
+    import requests
+except ImportError as e:  # pragma: no cover
+    raise SystemExit(
+        "请安装 requests：pip install requests\n"
+        "或在 code 目录执行：pip install -r requirements.txt"
+    ) from e
+
+from confluence_env_defaults import (  # noqa: E402 与 run_tree_crawler_resume.bat 默认一致
+    confluence_base_url,
+    confluence_password,
+    confluence_username,
+)
+
 
 # ---------------------------------------------------------------------------
 # 路径默认值（相对本文件所在仓库根目录的 output）
 # ---------------------------------------------------------------------------
 _REPO_ROOT = Path(__file__).resolve().parent.parent
-DEFAULT_INPUT_DIR = _REPO_ROOT / "output" / "AI项目_page_tree_md"
-DEFAULT_OUTPUT_DIR = _REPO_ROOT / "output" / "clean_md"
+DEFAULT_INPUT_DIR = _REPO_ROOT / "output" / "人力资源空间"
+DEFAULT_OUTPUT_DIR = _REPO_ROOT / "output" / "clean_md" / "人力资源空间"
 DEFAULT_LOG_DIR = _REPO_ROOT / "log"
 
 
 # ---------------------------------------------------------------------------
 # 1. 元数据提取
 # ---------------------------------------------------------------------------
+# 单行整段：由 [A](一行的 url) 创建, 最后修改于 [B](一行的 url)
 _METADATA_AUTHOR_DATE = re.compile(
     r"由\s*\[([^\]]+)\]\([^)]*\)\s*创建\s*,\s*最后修改于\s*\[([^\]]+)\]\([^)]*\)",
     re.MULTILINE,
+)
+# 作者 [name](url) 的 url 被 Confluence 折到下一行时：在「)」与「创建,」之间含换行，需 DOTALL
+_METADATA_AUTHOR_DATE_ML = re.compile(
+    r"由\s*\[([^\]]+)\](?:.|\n)*?创建\s*,\s*最后修改于\s*\[([^\]]+)\]",
+    re.DOTALL,
+)
+# 老页：)创建于[日期]…（无「最后修改于」）
+_METADATA_CREATED_ONLY_ML = re.compile(
+    r"由\s*\[([^\]]+)\](?:.|\n)*?创建\s*于\s*\[([^\]]+)\]",
+    re.DOTALL,
+)
+# 壳内 viewpageattachments 须在文首切刀前从 raw 取 URL 后拼进正文
+_VIEWPAGE_ATTACHMENTS_URL = re.compile(
+    r"https?://[^)\s\"']+/pages/viewpageattachments\.action\?pageId=\d+",
+    re.IGNORECASE,
+)
+# URL 前一小段中解析「附件(N) / t(N)」等
+_ATTACH_COUNT_BEFORE_URL = re.compile(
+    r"附件[（(](?P<na>\d+)[）)]|"
+    r"\[t[（(](?P<nb>\d+)[）)]\]|"
+    r"t[（(](?P<nc>\d+)[）)]\s*附件|"
+    r"t附件[（(](?P<nd>\d+)[）)]",
+    re.IGNORECASE,
 )
 # 整行/段移除：允许行首可选 *、空白，匹配到行尾
 _METADATA_LINE_REMOVE = re.compile(
@@ -55,23 +100,151 @@ _METADATA_SPLIT = re.compile(
 )
 
 
+def _is_confluence_time_line(line: str) -> bool:
+    """
+    判断是否为「最后修改于 [时间](https://...」的完整行（行尾为 )，可含链内 title 引号）。
+    """
+    t = line.rstrip()
+    if "最后修改于" not in t or "http" not in t or "(" not in t:
+        return False
+    return t.endswith(")")
+
+
+def _strip_confluence_byline_block(text: str) -> Tuple[str, str, str]:
+    """
+    按行删除 Confluence 页内「由 [作者](…可折行)创建, 最后修改于 [时间](http…)」元数据行块。
+    与示例「AI辅助编程工具对比」一致：作者链接触可拆成多行，时间链接在块末行。
+    返回 (新文本, author, last_modified)。
+    """
+    lines = text.splitlines(keepends=True)
+    out: List[str] = []
+    i = 0
+    n = len(lines)
+    author, last_modified = "", ""
+    byline_names = re.compile(
+        r"由\s*\[([^\]]+)\](?:.|\n)*?创建\s*,\s*最后修改于\s*\[([^\]]+)\]",
+        re.DOTALL,
+    )
+    start_pat = re.compile(r"^\s*([*+])?\s*由\s+\[")
+    while i < n:
+        line = lines[i]
+        if not start_pat.search(line):
+            out.append(line)
+            i += 1
+            continue
+        max_j = min(n, i + 20)
+        found = False
+        for j in range(i, max_j):
+            block = "".join(lines[i : j + 1])
+            if "创建" not in block or "最后修改于" not in block:
+                continue
+            m = byline_names.search(block)
+            if not m:
+                continue
+            last_ln = lines[j]
+            if not _is_confluence_time_line(last_ln) or "最后修改" not in last_ln:
+                continue
+            author = (m.group(1) or "").strip()
+            last_modified = (m.group(2) or "").strip()
+            i = j + 1
+            found = True
+            break
+        if not found:
+            out.append(line)
+            i += 1
+    return ("".join(out), author, last_modified)
+
+
+def _strip_confluence_created_byline_block(text: str) -> Tuple[str, str, str]:
+    """
+    删除老版导出的「由 [作者]…(折行)创建于[日期](http)」多行块（无「最后修改于」）；
+    如产品提升建议流程 示例；组 1 为作者、组 2 为日期的方括号内展示文本，时间写入 last_modified 字段。
+    """
+    lines = text.splitlines(keepends=True)
+    out: List[str] = []
+    i, n = 0, len(lines)
+    author, when = "", ""
+    names = re.compile(
+        r"由\s*\[([^\]]+)\](?:.|\n)*?创建\s*于\s*\[([^\]]+)\]",
+        re.DOTALL,
+    )
+    start = re.compile(r"^\s*([*+])?\s*由\s+\[")
+    while i < n:
+        line = lines[i]
+        if not start.search(line):
+            out.append(line)
+            i += 1
+            continue
+        if "最后修改于" in line:
+            out.append(line)
+            i += 1
+            continue
+        found = False
+        for j in range(i, min(n, i + 20)):
+            block = "".join(lines[i : j + 1])
+            if "最后修改于" in block:
+                break
+            if not re.search(r"创建\s*于", block) or re.search(
+                r"创建\s*,\s*最后修改", block
+            ):
+                continue
+            m = names.search(block)
+            if not m or "最后修改" in block:
+                continue
+            if not re.search(
+                r"\)创建\s*于|创建于\s*\[", block, re.IGNORECASE
+            ):
+                continue
+            l2 = lines[j]
+            if "http" not in l2 or not l2.rstrip().endswith(")"):
+                continue
+            author, when = m.group(1).strip(), m.group(2).strip()
+            i = j + 1
+            found = True
+            break
+        if not found:
+            out.append(line)
+            i += 1
+    return ("".join(out), author, when)
+
+
 def extract_metadata(text: str) -> Tuple[str, Dict[str, str]]:
     """
     从正文提取作者、最后修改时间，删除匹配到的元数据原文，返回 (剩余文本, meta)。
     meta 键：author, last_modified（可能为空字符串）。
+
+    Confluence 导出中作者 [name](url) 的 url 常被硬折行；先按行整段删除
+    _strip_confluence_byline_block，再回退单行 `_METADATA_AUTHOR_DATE` 与分行 `_METADATA_SPLIT`。
     """
-    author = ""
-    last_modified = ""
+    author, last_modified = "", ""
 
-    m = _METADATA_AUTHOR_DATE.search(text)
-    if m:
-        author = (m.group(1) or "").strip()
-        last_modified = (m.group(2) or "").strip()
+    # 1) 多行/折行作者链接触（如 AI辅助编程工具对比 示例）——有「最后修改于」
+    cleaned, a2, t2 = _strip_confluence_byline_block(text)
+    if a2 and t2:
+        author, last_modified = a2, t2
 
-    cleaned = _METADATA_LINE_REMOVE.sub("", text)
+    # 1b) 老页「由 … 创建于[日期]」无「最后修改于」（如 产品提升建议流程）
+    cleaned, ac, tc = _strip_confluence_created_byline_block(cleaned)
+    if ac and tc and not (author and last_modified):
+        author, last_modified = ac, tc
 
-    if not m:
-        # 尝试分行匹配
+    # 2) 整行在一条的「由 [x](...)创建, 最后修改于 [y](...)」
+    if not (author and last_modified):
+        m = _METADATA_AUTHOR_DATE.search(cleaned)
+        if m:
+            author = (m.group(1) or "").strip()
+            last_modified = (m.group(2) or "").strip()
+
+    cleaned = _METADATA_LINE_REMOVE.sub("", cleaned)
+
+    if not (author and last_modified):
+        m2 = _METADATA_AUTHOR_DATE.search(cleaned)
+        if m2:
+            author = author or (m2.group(1) or "").strip()
+            last_modified = last_modified or (m2.group(2) or "").strip()
+
+    # 3) 「由」行与「最后」行分行的旧格式
+    if not (author and last_modified):
         m_author = re.search(
             r"(?m)^\s*\*?\s*由\s*\[([^\]]+)\]\([^)]*\)\s*创建\s*,?\s*$",
             cleaned,
@@ -84,7 +257,12 @@ def extract_metadata(text: str) -> Tuple[str, Dict[str, str]]:
             author = (m_author.group(1) or "").strip()
         if m_time:
             last_modified = (m_time.group(1) or "").strip()
-        cleaned = _METADATA_SPLIT.sub("", cleaned)
+
+    cleaned = _METADATA_SPLIT.sub("", cleaned)
+    if not (author and last_modified):
+        cleaned, a3, t3 = _strip_confluence_byline_block(cleaned)
+        if a3 and t3:
+            author, last_modified = a3, t3
 
     meta = {"author": author, "last_modified": last_modified}
     return cleaned, meta
@@ -114,15 +292,34 @@ def prepend_yaml_front_matter(text: str, meta: Dict[str, str]) -> str:
 
 
 # ---------------------------------------------------------------------------
+# 1b. 文首切刀：以「[转至元数据起始](#…)」为界（其后的内容即正文，之前为侧栏/壳层）
+# ---------------------------------------------------------------------------
+_CUTOFF_LINE_METADATA_START = re.compile(
+    r"(?m)^\s*\[转至元数据起始\]\s*\(([^)]*)\)\s*(?:\r?\n)?",
+)
+
+
+def _cut_body_after_confluence_metadata_start(text: str) -> str:
+    """
+    丢弃自文件开头至并包含「[转至元数据起始](…」整行之前的全部内容。
+    与 Confluence 导出中「H1(当前页) → 转至元数据尾 → 由/时间 → 转至元数据起 → 真正文」结构一致；无此锚时原样返回。
+    """
+    m = _CUTOFF_LINE_METADATA_START.search(text)
+    if not m:
+        return text
+    return text[m.end() :].lstrip("\n")
+
+
+# ---------------------------------------------------------------------------
 # 2. 尾部截断
 # ---------------------------------------------------------------------------
+# 不依赖「赞成为第一个赞同者」：有赞同者/社交文案变动时易漏截或误截，优先用 ## 评论、无标签 等块。
 _TAIL_MARKERS: Tuple[str, ...] = (
-    "赞成为第一个赞同者",
+    "## 评论",
     "无标签",
     "写评论...",
     "概览\n\n内容工具",
     "基于 Atlassian Confluence",
-    "## 评论",
     '{"serverDuration":',
     "search\n\nrecentlyviewed",
     "更新恢复页面保留草稿取消",
@@ -130,7 +327,7 @@ _TAIL_MARKERS: Tuple[str, ...] = (
 
 
 def truncate_tail(text: str) -> str:
-    """自首次出现任一特征子串所在行之首起，丢弃该行及之后全部内容。"""
+    """在全文自前向后查找，取最早命中的尾标记所在行，从该行起丢弃到文末（优先 ## 评论 等结构块，已不含「赞成第一个」唯一点）。"""
     cut_pos: Optional[int] = None
     for marker in _TAIL_MARKERS:
         idx = text.find(marker)
@@ -142,6 +339,69 @@ def truncate_tail(text: str) -> str:
     if cut_pos is None:
         return text
     return text[:cut_pos].rstrip() + ("\n" if text[:cut_pos].strip() else "")
+
+
+# ---------------------------------------------------------------------------
+# 2b. 附件/图片：壳层中 viewpageattachments 与裸资源 URL
+# ---------------------------------------------------------------------------
+def _extract_confluence_attachments_index_md(raw: str) -> str:
+    """
+    在「文首切刀」会丢弃的壳层里常有 t 附件(1) / viewpageattachments 链；从 raw 先提取
+    再拼到切刀后的「## 附件与文件」段。无则返回空串。
+    """
+    seen: set = set()
+    out: List[str] = []
+    for m in _VIEWPAGE_ATTACHMENTS_URL.finditer(raw):
+        url = m.group(0)
+        if url in seen:
+            continue
+        pre = raw[max(0, m.start() - 220) : m.start()]
+        n: Optional[str] = None
+        for m2 in _ATTACH_COUNT_BEFORE_URL.finditer(pre):
+            g2 = m2.groupdict()
+            n = g2.get("na") or g2.get("nb") or g2.get("nc") or g2.get("nd")
+        label = f"共 {n} 个" if n else "本页"
+        seen.add(url)
+        out.append(f"* [附件与文件管理（{label}）]({url})")
+    if not out:
+        return ""
+    return "## 附件与文件\n" + "\n".join(out) + "\n\n"
+
+
+def _normalize_bare_confluence_file_lines(text: str) -> str:
+    """
+    将整行仅为 Confluence 资源 URL（download/attachments/…）的行转为可点击 Markdown。
+    图片类扩展名用 ![](url)，否则用 * [文件名](url)。
+    """
+    _durl = r"https?://[^)\s\"']+/download/attachments/[^/]+/[^)\s\"']+"
+    img_re = re.compile(
+        _durl + r"\.(?:png|jpe?g|gif|webp|svg)(?:\?[^)\s\"']*)?$",
+        re.IGNORECASE,
+    )
+    bare_line = re.compile(rf"^({_durl})$", re.IGNORECASE)
+    out: List[str] = []
+    for line in text.splitlines(keepends=True):
+        st = line.rstrip("\n\r").strip()
+        if not st:
+            out.append(line)
+            continue
+        if st[0] in ("#", "-", "*", ">", "|", "`", "!") or st.startswith("["):
+            out.append(line)
+            continue
+        m = bare_line.match(st)
+        if m and "download/attachments" in st:
+            u = m.group(1)
+            path = urlparse(u).path
+            name = unquote(path.rsplit("/", 1)[-1].split("?")[0]) or u
+            if img_re.match(u) or re.search(
+                r"image\d|thumbnail", u, re.IGNORECASE
+            ):
+                out.append(f"![{name}]({u})\n")
+            else:
+                out.append(f"* [{name}]({u})\n")
+        else:
+            out.append(line)
+    return "".join(out)
 
 
 # ---------------------------------------------------------------------------
@@ -449,17 +709,299 @@ def compress_blank_lines(text: str) -> str:
 
 
 # ---------------------------------------------------------------------------
-# 管道与文件遍历
+# 2c. Confluence REST + 直链：清洗后同目录下载附件
 # ---------------------------------------------------------------------------
+# 从 MD 中收集 pageId（与 shell 中 viewpage / viewpageattachments 等一致）
+_PAGEID_IN_URL_RE = re.compile(r"[\?&]pageId=(\d+)", re.IGNORECASE)
+# 正文中已有直链（与 _normalize_bare 中逻辑同系：避免吞到引号后字符）
+_DIRECT_ATTACH_URL_RE = re.compile(
+    r"https?://[^)\s\"']+/download/attachments/[^)\s\"']+",
+    re.IGNORECASE,
+)
+
+
+@dataclass
+class AttachmentDownloadConfig:
+    """与 --download-attachments 配套；认证可二选一或组合。"""
+
+    enabled: bool = False
+    user: str = ""
+    password: str = ""
+    cookie: str = ""
+    request_delay: float = 0.5
+    rest_limit: int = 50
+
+
+def _safe_win_filename(name: str, max_len: int = 180) -> str:
+    for c in '<>:"/\\|?*':
+        name = name.replace(c, "_")
+    name = name.strip() or "attachment"
+    return name[:max_len]
+
+
+def _confluence_site_bases(blob: str) -> List[str]:
+    """从正文中推断 Confluence 根 URL（scheme://host:port），优先带 /pages/ 或 /download/ 的。"""
+    bases: List[str] = []
+    seen: Set[str] = set()
+    for pat in (
+        r"(https?://[^\s\"'`()<>\]]+)(?=/pages/)",
+        r"(https?://[^\s\"'`()<>\]]+)(?=/download/attachments/)",
+    ):
+        for m in re.finditer(pat, blob, re.IGNORECASE):
+            b = m.group(1).rstrip("/")
+            if b not in seen and "://" in b:
+                seen.add(b)
+                bases.append(b)
+    if bases:
+        return bases
+    m = re.search(
+        r"(https?://[a-z0-9.:-]+)(?=/pages/[^ \n)\"']*[\?&]pageId=)",
+        blob,
+        re.IGNORECASE,
+    )
+    if m:
+        return [m.group(1).rstrip("/")]
+    m2 = re.search(r"https?://[a-z0-9.:-]+(?=/)", blob, re.IGNORECASE)
+    if m2:
+        return [m2.group(0).rstrip("/")]
+    b = confluence_base_url()
+    return [b] if b else []
+
+
+def _link_download_url(
+    site_base: str, download_field: str
+) -> str:
+    t = (download_field or "").strip()
+    if t.lower().startswith("http://") or t.lower().startswith("https://"):
+        return t
+    if not t:
+        return ""
+    base = site_base.rstrip("/")
+    if t.startswith("/"):
+        return f"{base}{t}"
+    return f"{base}/{t}"
+
+
+def _confluence_get_json(
+    session: requests.Session,
+    url: str,
+    request_delay: float,
+    logger: logging.Logger,
+) -> Optional[Dict[str, Any]]:
+    try:
+        time.sleep(request_delay)
+        r = session.get(
+            url,
+            timeout=120,
+            headers={"Accept": "application/json"},
+        )
+    except OSError as e:  # pragma: no cover
+        logger.error("Confluence 请求失败 %s: %s", url, e)
+        return None
+    if r.status_code == 404:
+        logger.debug("Confluence 404（探测站点/页面时属正常）: %s", url)
+        return None
+    if r.status_code in (401, 403):
+        logger.error("Confluence 拒绝访问 %s：HTTP %s", url, r.status_code)
+        return None
+    if not r.ok:
+        logger.error("Confluence %s：HTTP %s", url, r.status_code)
+        return None
+    try:
+        return r.json()
+    except ValueError:
+        logger.error("Confluence 非 JSON: %s", url)
+        return None
+
+
+def _list_attachments_for_page(
+    session: requests.Session,
+    site_base: str,
+    page_id: str,
+    rest_limit: int,
+    request_delay: float,
+    logger: logging.Logger,
+) -> List[Dict[str, Any]]:
+    out: List[Dict[str, Any]] = []
+    start = 0
+    rest_base = f"{site_base.rstrip('/')}/rest/api"
+    while True:
+        u = f"{rest_base}/content/{page_id}/child/attachment?start={start}&limit={rest_limit}"
+        data = _confluence_get_json(session, u, request_delay, logger)
+        if not data or "results" not in data:
+            break
+        part = data["results"]
+        if not part:
+            break
+        out.extend(part)
+        if len(part) < rest_limit:
+            break
+        start += len(part)
+    return out
+
+
+def _download_url_to(
+    session: requests.Session,
+    file_url: str,
+    dest: Path,
+    request_delay: float,
+    logger: logging.Logger,
+) -> bool:
+    if dest.is_file() and dest.stat().st_size > 0:
+        return True
+    try:
+        time.sleep(request_delay)
+        r = session.get(file_url, stream=True, timeout=300, allow_redirects=True)
+    except OSError as e:  # pragma: no cover
+        logger.error("下载失败 %s: %s", file_url, e)
+        return False
+    if r.status_code in (401, 403, 404):
+        logger.error("下载被拒绝或不存在 %s：HTTP %s", file_url, r.status_code)
+        return False
+    if r.status_code >= 400:
+        logger.error("下载失败 %s：HTTP %s", file_url, r.status_code)
+        return False
+    dest.parent.mkdir(parents=True, exist_ok=True)
+    tmp = dest.with_name(dest.name + ".part")
+    try:
+        with open(tmp, "wb") as f:
+            for chunk in r.iter_content(65536):
+                if chunk:
+                    f.write(chunk)
+        tmp.replace(dest)
+        return True
+    except OSError as e:  # pragma: no cover
+        logger.error("写出失败 %s: %s", dest, e)
+        if tmp.is_file():
+            try:
+                tmp.unlink()
+            except OSError:
+                pass
+        return False
+
+
+def _filename_from_url(url: str) -> str:
+    p = urlparse(url)
+    seg = p.path.rsplit("/", 1)
+    if len(seg) >= 2 and seg[1]:
+        return _safe_win_filename(unquote(seg[1].split("?")[0]))
+    return "attachment.bin"
+
+
+def _dedupe_dest_for_url(out_dir: Path, url: str, base_name: str) -> Path:
+    p = out_dir / base_name
+    if not p.is_file():
+        return p
+    d = hashlib.md5(url.encode("utf-8", errors="replace")).hexdigest()[:8]
+    return out_dir / f"{d}_{base_name}"
+
+
+def _build_confluence_session(cfg: AttachmentDownloadConfig) -> requests.Session:
+    s = requests.Session()
+    s.headers["User-Agent"] = "Htek/clean_md_files (Confluence attach)"
+    if cfg.user and cfg.password:
+        s.auth = (cfg.user, cfg.password)
+    if cfg.cookie:
+        s.headers["Cookie"] = cfg.cookie
+    return s
+
+
+def download_confluence_attachments_by_markdown(
+    raw: str,
+    cleaned: str,
+    out_dir: Path,
+    cfg: AttachmentDownloadConfig,
+    session: requests.Session,
+    logger: logging.Logger,
+) -> Tuple[int, int]:
+    """
+    合并 raw 与清洗结果：用 pageId 调 Confluence REST 子附件的 download 链，再合入正文中
+    出现的 /download/attachments/ 直链，按绝对 URL 去重后保存到 out_dir。
+
+    返回 (成功数, 失败数)。
+    """
+    if not cfg.enabled:
+        return 0, 0
+    blob = f"{raw}\n{cleaned}"
+    success, failed = 0, 0
+    done_urls: Set[str] = set()
+    bases = _confluence_site_bases(blob)
+
+    page_ids = set(_PAGEID_IN_URL_RE.findall(blob))
+    direct_urls: Set[str] = {
+        m.group(0) for m in _DIRECT_ATTACH_URL_RE.finditer(blob)
+    }
+
+    # 1) REST：每个 pageId 在推断出的各 site 上试，直到某一站点返回非空子附件
+    for pid in sorted(page_ids, key=int):
+        atts: List[Dict[str, Any]] = []
+        site_ok = ""
+        for site in bases or []:
+            part = _list_attachments_for_page(
+                session,
+                site,
+                pid,
+                cfg.rest_limit,
+                cfg.request_delay,
+                logger,
+            )
+            if part:
+                atts = part
+                site_ok = site
+                break
+        if not atts or not site_ok:
+            continue
+        for att in atts:
+            durl = _link_download_url(
+                site_ok,
+                str((att.get("_links") or {}).get("download") or ""),
+            )
+            if not durl or durl in done_urls:
+                continue
+            done_urls.add(durl)
+            title = (att.get("title") or "").strip() or _filename_from_url(durl)
+            name = _safe_win_filename(unquote(title.split("?")[0])) or "file"
+            att_id = str(att.get("id") or "")
+            fn = f"{att_id[:20]}_{name}" if att_id else name
+            out_p = out_dir / fn
+            if _download_url_to(
+                session, durl, out_p, cfg.request_delay, logger
+            ):
+                success += 1
+            else:
+                failed += 1
+
+    # 2) 直链：与 REST 已下载 URL 去重
+    for durl in sorted(direct_urls):
+        if durl in done_urls:
+            continue
+        done_urls.add(durl)
+        name = _filename_from_url(durl)
+        if name in ("attachment.bin", "attachment", "file"):
+            name = "file.bin"
+        out_p = _dedupe_dest_for_url(out_dir, durl, name)
+        if _download_url_to(
+            session, durl, out_p, cfg.request_delay, logger
+        ):
+            success += 1
+        else:
+            failed += 1
+    return success, failed
+
+
 def clean_markdown_pipeline(raw: str) -> str:
     """按用户指定顺序链式调用各清洗步骤。"""
-    text = raw
-    text, meta = extract_metadata(text)
+    att = _extract_confluence_attachments_index_md(raw)
+    text, meta = extract_metadata(raw)
+    text = _cut_body_after_confluence_metadata_start(text)
+    if att:
+        text = att + text
     text = prepend_yaml_front_matter(text, meta)
     text = truncate_tail(text)
     text = clean_ui_noise(text)
     text = clean_anchors_breadcrumbs_icons(text)
     text = dedupe_opening_titles(text)
+    text = _normalize_bare_confluence_file_lines(text)
     text = compress_blank_lines(text)
     return text.rstrip() + "\n"
 
@@ -472,13 +1014,21 @@ def process_all(
     input_dir: Path,
     output_dir: Path,
     logger: logging.Logger,
-) -> Tuple[int, int]:
+    attach_cfg: Optional[AttachmentDownloadConfig] = None,
+) -> Tuple[int, int, int, int]:
     """
-    遍历 input_dir 下全部 .md，写入 output_dir 保持相对路径。
-    返回 (成功数, 失败数)。
+    遍历 input_dir 下全部 .md，写入 output_dir 保持相对路径；可选在写盘后对每篇
+    合并 raw+正文，按 REST 与直链下载附件到**输出 .md 同目录**。
+
+    返回 (md 成功数, md 失败数, 附件成功数, 附件失败/跳过不计入失败时可忽略)。
+    附件 “失败数” 仅统计 _download_url_to 返回 False 与下载阶段异常。
     """
+    ac = attach_cfg or AttachmentDownloadConfig(False)
+    session: Optional[requests.Session] = (
+        _build_confluence_session(ac) if ac.enabled else None
+    )
     files = iter_markdown_files(input_dir)
-    ok, fail = 0, 0
+    ok, fail, att_ok, att_fail = 0, 0, 0, 0
     for path in tqdm(files, desc="清洗 Markdown", unit="file"):
         rel = path.relative_to(input_dir)
         out_path = output_dir / rel
@@ -488,10 +1038,25 @@ def process_all(
             out_path.parent.mkdir(parents=True, exist_ok=True)
             out_path.write_text(cleaned, encoding="utf-8", newline="\n")
             ok += 1
+            if session and ac.enabled:
+                try:
+                    a, f = download_confluence_attachments_by_markdown(
+                        raw,
+                        cleaned,
+                        out_path.parent,
+                        ac,
+                        session,
+                        logger,
+                    )
+                    att_ok += a
+                    att_fail += f
+                except Exception:  # pragma: no cover
+                    logger.exception("附件下载过程异常: %s", out_path)
+                    att_fail += 1
         except Exception:
             fail += 1
             logger.exception("处理失败: %s", path)
-    return ok, fail
+    return ok, fail, att_ok, att_fail
 
 
 def setup_logger(log_dir: Path) -> logging.Logger:
@@ -530,6 +1095,48 @@ def parse_args(argv: Optional[List[str]] = None) -> argparse.Namespace:
         default=DEFAULT_LOG_DIR,
         help=f"日志目录（默认：{DEFAULT_LOG_DIR}）",
     )
+    p.add_argument(
+        "--download-attachments",
+        action="store_true",
+        help="清洗后从正文合并 raw 解析 pageId 与直链，调用 Confluence REST 并下载到输出 .md 同目录。",
+    )
+    p.add_argument(
+        "--confluence-user",
+        default="",
+        help="Basic 认证用户名；环境变量 CONFLUENCE_USERNAME / CONFLUENCE_USER；"
+        "未设置时与 run_tree_crawler_resume.bat 中默认一致。",
+    )
+    p.add_argument(
+        "--confluence-password",
+        default="",
+        help="Basic 认证密码；环境变量 CONFLUENCE_PASSWORD；"
+        "未设置时与 run_tree_crawler_resume.bat 中默认一致。",
+    )
+    p.add_argument(
+        "--confluence-cookie",
+        default="",
+        help='浏览器 Cookie 串，例如 "JSESSIONID=..."。',
+    )
+    p.add_argument(
+        "--confluence-cookie-file",
+        type=Path,
+        default=None,
+        help="从文件读取 Cookie（整文件为一个 Cookie 头内容或一行）。",
+    )
+    p.add_argument(
+        "--request-delay",
+        type=float,
+        default=0.5,
+        metavar="SEC",
+        help="两次 HTTP 之间的最小间隔（秒，默认 0.5，减轻 Confluence 压力）。",
+    )
+    p.add_argument(
+        "--rest-attachment-page-size",
+        type=int,
+        default=50,
+        metavar="N",
+        help="每页拉取子附件的 REST limit（默认 50）。",
+    )
     return p.parse_args(argv)
 
 
@@ -548,8 +1155,44 @@ def main(argv: Optional[List[str]] = None) -> int:
     print(f"输出：{output_dir}")
     print(f"错误日志：{log_dir / 'clean_md_files.log'}")
 
-    ok, fail = process_all(input_dir, output_dir, logger)
-    print(f"完成：成功 {ok}，失败 {fail}")
+    cookie = (args.confluence_cookie or "").strip()
+    if getattr(args, "confluence_cookie_file", None) is not None:
+        cfp: Path = args.confluence_cookie_file
+        cfp = cfp.expanduser().resolve()
+        if cfp.is_file():
+            cookie = cfp.read_text(encoding="utf-8", errors="replace").strip()
+        elif args.confluence_cookie_file:  # 显式传了但不存在
+            print(
+                f"警告：--confluence-cookie-file 不存在，已忽略：{cfp}",
+                file=sys.stderr,
+            )
+    ac = AttachmentDownloadConfig(
+        enabled=bool(getattr(args, "download_attachments", False)),
+        user=(getattr(args, "confluence_user", "") or "").strip()
+        or confluence_username(),
+        password=(getattr(args, "confluence_password", "") or "").strip()
+        or confluence_password(),
+        cookie=cookie,
+        request_delay=float(
+            getattr(args, "request_delay", 0.5) or 0.0
+        )
+        or 0.0,
+        rest_limit=max(1, int(getattr(args, "rest_attachment_page_size", 50) or 50)),
+    )
+    if ac.enabled and not (ac.user and ac.password) and not ac.cookie:
+        print(
+            "提示：已启用 --download-attachments，但未提供 "
+            "用户名+密码 或 Cookie；若 Confluence 需登录，REST/下载将返回 401/403。",
+            file=sys.stderr,
+        )
+
+    ok, fail, aok, afail = process_all(
+        input_dir, output_dir, logger, ac
+    )
+    print(
+        f"完成：Markdown 成功 {ok}，失败 {fail}；"
+        f"附件下载成功 {aok}，失败/拒绝 {afail}（需开启 --download-attachments）。"
+    )
     return 1 if fail else 0
 
 

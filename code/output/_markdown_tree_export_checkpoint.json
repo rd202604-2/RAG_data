@@ -26,15 +26,16 @@
   ],
   "trees_completed": [
     "e:\\htek\\output\\页面树集合\\htek信息化空间_page_tree.json",
-    "e:\\htek\\output\\页面树集合\\下一代话机_page_tree.json"
+    "e:\\htek\\output\\页面树集合\\下一代话机_page_tree.json",
+    "e:\\htek\\output\\页面树集合\\人力资源空间_page_tree.json"
   ],
   "last_page": {
-    "tree_json": "E:\\Htek\\output\\页面树集合\\人力资源空间_page_tree.json",
-    "page_id": "140544831",
-    "markdown_path": "E:\\Htek\\output\\人力资源空间_page_tree\\人力资源空间\\员工培训\\校招生培养\\培训课件＆录音\\第一周\\第一周.md",
-    "updated_at": "2026-04-23T17:59:34"
+    "tree_json": "E:\\Htek\\output\\页面树集合\\供应链园地_page_tree.json",
+    "page_id": "129467556",
+    "markdown_path": "E:\\Htek\\output\\供应链园地_page_tree\\供应链园地\\ME\\UC9XX\\UC926\\UC926.md",
+    "updated_at": "2026-04-24T11:12:37"
   },
   "status": "running",
   "reason": "page_saved",
-  "saved_at": "2026-04-23T17:59:34"
+  "saved_at": "2026-04-24T11:12:37"
 }
