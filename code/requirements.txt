@@ -1,4 +1,5 @@
 # MinerU / pyarrow 等二进制多针对 numpy 1.x；使用 parser=mineru 时请保持 numpy<2
+# 若仅需运行 Pipeline_markitdown.py，优先使用 requirements_pipeline_markitdown.txt（更小、钉死 NumPy 1.x）
 numpy>=1.26.4,<2.0
 tqdm>=4.66.0
 requests>=2.31.0

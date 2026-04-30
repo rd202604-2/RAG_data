@@ -1,0 +1,7 @@
+# Pipeline_markitdown.py 专用依赖（与 NumPy 2.x / pyarrow / pandas 二进制兼容）
+# 钉死 NumPy 1.x，避免 pandas/pyarrow/numexpr/bottleneck 等与 NumPy 2 ABI 不匹配
+numpy>=1.26.4,<2.0
+pyarrow>=14.0.0,<19.0.0
+pandas>=2.0.0,<3.0.0
+openai>=1.0.0
+markitdown>=0.1.5

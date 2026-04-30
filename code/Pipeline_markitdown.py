@@ -1,11 +1,13 @@
 import argparse
 import concurrent.futures
 import datetime as dt
+import functools
 import json
 import logging
 import os
 import re
 import subprocess
+import sys
 import tempfile
 import threading
 import time
@@ -37,7 +39,23 @@ QWEN_MODELS: List[str] = [
 
 MODERN_EXTS = {".docx", ".pptx", ".xlsx", ".pdf", ".png"}
 LEGACY_EXTS = {".doc", ".xls", ".ppt"}
-VIDEO_EXTS = {".avi", ".mp4", ".mov", ".mkv"}
+# 音视频不参与转换：耗时过长且易报错，仅记录跳过（不调用 ffmpeg / MarkItDown 音频链路）
+VIDEO_EXTS = {".avi", ".mp4", ".mov", ".mkv", ".webm", ".wmv", ".flv", ".m4v"}
+AUDIO_EXTS = {
+    ".mp3",
+    ".wav",
+    ".m4a",
+    ".aac",
+    ".flac",
+    ".ogg",
+    ".opus",
+    ".wma",
+    ".aiff",
+    ".au",
+}
+SKIP_MEDIA_EXTS = VIDEO_EXTS | AUDIO_EXTS
+# XMind 不支持自动转换：跳过并记 INFO，不记入失败
+SKIP_XMIND_EXTS = {".xmind"}
 
 # 兜底放行一些常见可直接转文本格式
 DIRECT_EXTS = MODERN_EXTS | {".md", ".txt", ".jpg", ".jpeg"}
@@ -96,6 +114,58 @@ def build_dashscope_client() -> OpenAI:
     return OpenAI(api_key=api_key, base_url=DASHSCOPE_BASE_URL)
 
 
+def validate_dashscope_api_key(logger: logging.Logger) -> None:
+    """
+    启动前校验百炼 API Key，避免线程池内才发现未配置。
+    Windows 下一键配置说明写入日志与 stderr，便于对照 bat / 系统环境变量。
+    """
+    key = (os.getenv("DASHSCOPE_API_KEY") or "").strip()
+    if key:
+        return
+    msg = (
+        "未设置环境变量 DASHSCOPE_API_KEY。\n\n"
+        "Windows 配置方式（任选其一）：\n"
+        "  1) 当前 PowerShell 会话：  $env:DASHSCOPE_API_KEY=\"sk-你的密钥\"\n"
+        "  2) 当前 CMD 会话：        set DASHSCOPE_API_KEY=sk-你的密钥\n"
+        "  3) 用户级永久（新开终端生效）： setx DASHSCOPE_API_KEY \"sk-你的密钥\"\n"
+        "  4) 编辑本仓库 code\\run_markitdown_pipeline.bat，在「配置区」设置 set DASHSCOPE_API_KEY=...\n\n"
+        "密钥获取：阿里云控制台 -> 百炼 -> API-KEY。\n"
+    )
+    logger.error(msg.strip())
+    print(msg, file=sys.stderr)
+    raise SystemExit(3)
+
+
+@functools.lru_cache(maxsize=1)
+def resolve_soffice_executable() -> str:
+    """
+    解析 LibreOffice soffice.exe 绝对路径，避免仅依赖 PATH 导致 WinError 2。
+    优先级：LIBREOFFICE_SOFFICE_PATH / SOFFICE_PATH -> 常见安装目录。
+    """
+    candidates: List[Path] = []
+    for env_name in ("LIBREOFFICE_SOFFICE_PATH", "SOFFICE_PATH"):
+        raw = (os.getenv(env_name) or "").strip().strip('"')
+        if raw:
+            candidates.append(Path(raw))
+    candidates.extend(
+        [
+            Path(r"D:\Program Files\LibreOffice\program\soffice.exe"),
+            Path(r"C:\Program Files\LibreOffice\program\soffice.exe"),
+            Path(r"C:\Program Files (x86)\LibreOffice\program\soffice.exe"),
+        ]
+    )
+    for p in candidates:
+        if p.is_file():
+            return str(p.resolve())
+    raise FileNotFoundError(
+        "未找到 LibreOffice 的 soffice.exe（WinError 2）。\n"
+        "请安装 LibreOffice，或设置环境变量 LIBREOFFICE_SOFFICE_PATH 为 soffice.exe 绝对路径，例如：\n"
+        r'  set LIBREOFFICE_SOFFICE_PATH="D:\Program Files\LibreOffice\program\soffice.exe"'
+        "\n"
+        r'  （或 "C:\Program Files\LibreOffice\program\soffice.exe"）'
+    )
+
+
 def setup_logger() -> logging.Logger:
     LOG_DIR.mkdir(parents=True, exist_ok=True)
     logger = logging.getLogger("pipeline_markitdown")
@@ -140,11 +210,14 @@ def soffice_convert_legacy(src: Path, logger: logging.Logger) -> PreparedInput:
     if ext not in mapping:
         raise ValueError(f"不支持的 legacy 扩展名: {ext}")
 
+    soffice_exe = resolve_soffice_executable()
+    logger.info("Legacy 转换使用 LibreOffice: %s", soffice_exe)
+
     tmp = tempfile.TemporaryDirectory(prefix="legacy_to_modern_")
     out_dir = Path(tmp.name)
     target_ext = mapping[ext]
     command = [
-        "soffice",
+        soffice_exe,
         "--headless",
         "--convert-to",
         target_ext,
@@ -166,39 +239,10 @@ def soffice_convert_legacy(src: Path, logger: logging.Logger) -> PreparedInput:
     )
 
 
-def ffmpeg_extract_audio(src: Path, logger: logging.Logger) -> PreparedInput:
-    tmp = tempfile.TemporaryDirectory(prefix="video_to_audio_")
-    out_dir = Path(tmp.name)
-    audio_path = out_dir / f"{src.stem}.mp3"
-    command = [
-        "ffmpeg",
-        "-y",
-        "-i",
-        str(src),
-        "-vn",
-        "-acodec",
-        "libmp3lame",
-        str(audio_path),
-    ]
-    run_subprocess(command, logger)
-    if not audio_path.exists():
-        tmp.cleanup()
-        raise FileNotFoundError(f"ffmpeg 抽取音频后未产出文件: {audio_path}")
-    return PreparedInput(
-        source_file=src,
-        prepared_file=audio_path,
-        file_type="audio",
-        preprocess_trace=f"video_extract_audio:{src.suffix.lower()}->.mp3",
-        temp_dir=tmp,
-    )
-
-
 def route_and_prepare(src: Path, logger: logging.Logger) -> PreparedInput:
     ext = src.suffix.lower()
     if ext in LEGACY_EXTS:
         return soffice_convert_legacy(src, logger)
-    if ext in VIDEO_EXTS:
-        return ffmpeg_extract_audio(src, logger)
     if ext in DIRECT_EXTS:
         return PreparedInput(
             source_file=src,
@@ -362,6 +406,37 @@ def convert_one_file(
     logger: logging.Logger,
 ) -> ConvertResult:
     started = time.perf_counter()
+    ext = src.suffix.lower()
+    if ext in SKIP_MEDIA_EXTS:
+        elapsed = time.perf_counter() - started
+        logger.info(
+            "跳过(音频/视频，不转换) | %s | ext=%s",
+            src,
+            ext or "(无扩展名)",
+        )
+        return ConvertResult(
+            source_file=src,
+            output_file=None,
+            used_llm_model="",
+            status="skipped",
+            error="",
+            preprocess_trace="skip_audio_video",
+            elapsed_sec=elapsed,
+        )
+
+    if ext in SKIP_XMIND_EXTS:
+        elapsed = time.perf_counter() - started
+        logger.info("跳过(.xmind 不支持自动转换) | %s", src)
+        return ConvertResult(
+            source_file=src,
+            output_file=None,
+            used_llm_model="",
+            status="skipped",
+            error="",
+            preprocess_trace="skip_xmind",
+            elapsed_sec=elapsed,
+        )
+
     model_name = dispatcher.get_next_model()
     prepared: Optional[PreparedInput] = None
     try:
@@ -427,8 +502,15 @@ def parse_args() -> argparse.Namespace:
 def summarize(results: Iterable[ConvertResult], logger: logging.Logger) -> int:
     items = list(results)
     ok = sum(1 for r in items if r.status == "ok")
-    fail = len(items) - ok
-    logger.info("总文件数: %d | 成功: %d | 失败: %d", len(items), ok, fail)
+    skipped = sum(1 for r in items if r.status == "skipped")
+    fail = sum(1 for r in items if r.status == "failed")
+    logger.info(
+        "总文件数: %d | 成功: %d | 跳过: %d | 失败: %d",
+        len(items),
+        ok,
+        skipped,
+        fail,
+    )
     logger.info("运行日志: %s", RUN_LOG_PATH)
     logger.info("失败明细: %s", FAIL_LOG_PATH)
     return 1 if fail else 0
@@ -440,6 +522,7 @@ def main() -> int:
     output_dir: Path = args.output_dir.resolve()
     workers: int = max(1, int(args.workers))
     logger = setup_logger()
+    validate_dashscope_api_key(logger)
 
     if not input_dir.is_dir():
         logger.error("输入目录不存在或不是文件夹: %s", input_dir)
